@@ -6,13 +6,34 @@ import { checkRateLimit } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(req?: NextRequest) {
   try {
-    return NextResponse.json(ProjectRecordStore.getInstance().list(), {
-      headers: {
-        'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
-      },
+    const url = req?.nextUrl ?? (req?.url ? new URL(req.url) : null);
+    const searchParams = url?.searchParams;
+    const limitParam = searchParams?.get('limit');
+    const cursor = searchParams?.get('cursor') || undefined;
+
+    const limit =
+      limitParam !== null && limitParam !== undefined
+        ? parseInt(limitParam, 10)
+        : 100;
+
+    const result = ProjectRecordStore.getInstance().list({
+      limit: !isNaN(limit) && limit > 0 ? limit : 100,
+      cursor,
     });
+
+    return NextResponse.json(
+      {
+        projects: result.projects,
+        nextCursor: result.nextCursor,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=30, stale-while-revalidate=60',
+        },
+      },
+    );
   } catch {
     return NextResponse.json(
       { error: 'Project records are temporarily unavailable.' },

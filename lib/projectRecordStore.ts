@@ -144,7 +144,60 @@ const migrations: Migration[] = [
     `);
     },
   },
+  {
+    version: 2,
+    name: 'composite index for cursor pagination',
+    up(db) {
+      db.exec(`
+        CREATE INDEX IF NOT EXISTS idx_accountability_projects_created_id
+          ON accountability_projects(created_at DESC, id DESC);
+      `);
+    },
+  },
 ];
+
+export interface ProjectListOptions {
+  limit?: number;
+  cursor?: string | null;
+}
+
+export type ProjectListResult = ProjectSummary[] & {
+  projects: ProjectSummary[];
+  nextCursor: string | null;
+};
+
+export function encodeProjectCursor(createdAt: number, id: string): string {
+  return Buffer.from(`${createdAt}:${id}`, 'utf8').toString('base64url');
+}
+
+export function decodeProjectCursor(
+  cursor: string,
+): { createdAt: number; id: string } | null {
+  if (
+    typeof cursor !== 'string' ||
+    cursor.length === 0 ||
+    cursor.length > 512
+  ) {
+    return null;
+  }
+  let raw = cursor;
+  try {
+    const decoded = Buffer.from(cursor, 'base64url').toString('utf8');
+    if (decoded.includes(':')) {
+      raw = decoded;
+    }
+  } catch {
+    // raw remains cursor
+  }
+  const sep = raw.lastIndexOf(':');
+  if (sep <= 0) return null;
+  const createdAt = Number(raw.slice(0, sep));
+  const id = raw.slice(sep + 1);
+  if (!Number.isInteger(createdAt) || createdAt < 0 || id.length === 0) {
+    return null;
+  }
+  return { createdAt, id };
+}
 
 export class ProjectRecordStore {
   private static instance: ProjectRecordStore | null = null;
@@ -155,20 +208,71 @@ export class ProjectRecordStore {
     this.db.pragma('foreign_keys = ON');
   }
 
-  static getInstance() {
+  static resetInstance(): void {
+    if (this.instance) {
+      try {
+        this.instance.db.close();
+      } catch {
+        // ignore if closed
+      }
+      this.instance = null;
+    }
+  }
+
+  static getInstance(db?: Database.Database) {
     if (!this.instance) {
       this.instance = new ProjectRecordStore(
-        openSqliteDb(
-          'project-records.db',
-          'PROJECT_RECORDS_DB_PATH',
-          migrations,
-        ),
+        db ??
+          openSqliteDb(
+            'project-records.db',
+            'PROJECT_RECORDS_DB_PATH',
+            migrations,
+          ),
       );
     }
     return this.instance;
   }
 
-  list(): ProjectSummary[] {
+  list(options?: ProjectListOptions): ProjectListResult;
+  list(limit?: number, cursor?: string | null): ProjectListResult;
+  list(
+    optionsOrLimit?: ProjectListOptions | number,
+    maybeCursor?: string | null,
+  ): ProjectListResult {
+    let limit = 100;
+    let cursorStr: string | null | undefined = undefined;
+
+    if (typeof optionsOrLimit === 'number') {
+      limit = optionsOrLimit > 0 ? optionsOrLimit : 100;
+      cursorStr = maybeCursor;
+    } else if (optionsOrLimit && typeof optionsOrLimit === 'object') {
+      if (
+        typeof optionsOrLimit.limit === 'number' &&
+        optionsOrLimit.limit > 0
+      ) {
+        limit = optionsOrLimit.limit;
+      }
+      cursorStr = optionsOrLimit.cursor;
+    }
+
+    const clauses: string[] = [];
+    const params: Record<string, unknown> = {
+      limit: limit + 1,
+    };
+
+    if (cursorStr) {
+      const decoded = decodeProjectCursor(cursorStr);
+      if (decoded) {
+        clauses.push(
+          '(p.created_at < @cursorCreatedAt OR (p.created_at = @cursorCreatedAt AND p.id < @cursorId))',
+        );
+        params.cursorCreatedAt = decoded.createdAt;
+        params.cursorId = decoded.id;
+      }
+    }
+
+    const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
+
     const projects = this.db
       .prepare(
         `SELECT p.*,
@@ -176,15 +280,22 @@ export class ProjectRecordStore {
       (SELECT COUNT(*) FROM accountability_milestones m WHERE m.project_id = p.id AND m.status = 'completed') AS completed_milestones,
       (SELECT COUNT(*) FROM accountability_updates u WHERE u.project_id = p.id) AS update_count,
       (SELECT m.title FROM accountability_milestones m WHERE m.project_id = p.id ORDER BY m.position LIMIT 1) AS first_milestone_title
-      FROM accountability_projects p ORDER BY p.created_at DESC LIMIT 100`,
+      FROM accountability_projects p
+      ${where}
+      ORDER BY p.created_at DESC, p.id DESC
+      LIMIT @limit`,
       )
-      .all() as (ProjectRow & {
+      .all(params) as (ProjectRow & {
       milestone_count: number;
       completed_milestones: number;
       update_count: number;
       first_milestone_title: string | null;
     })[];
-    return projects.map((row) => ({
+
+    const hasMore = projects.length > limit;
+    const pageRows = hasMore ? projects.slice(0, limit) : projects;
+
+    const mapped = pageRows.map((row) => ({
       id: row.id,
       slug: row.slug,
       title: row.title,
@@ -203,6 +314,16 @@ export class ProjectRecordStore {
       completedMilestones: row.completed_milestones,
       updateCount: row.update_count,
     }));
+
+    const last = pageRows[pageRows.length - 1];
+    const nextCursor =
+      hasMore && last ? encodeProjectCursor(last.created_at, last.id) : null;
+
+    const cleanProjects = [...mapped];
+    return Object.assign(mapped, {
+      projects: cleanProjects,
+      nextCursor,
+    }) as ProjectListResult;
   }
 
   get(slug: string): ProjectRecord | null {
