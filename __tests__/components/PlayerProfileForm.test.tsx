@@ -8,7 +8,6 @@ import {
 import '@testing-library/jest-dom';
 import PlayerProfileForm from '@/components/player/PlayerProfileForm';
 import { useWallet } from '@/hooks/useWallet';
-import { useIPFSUpload } from '@/hooks/useIPFSUpload';
 import { buildRegisterPlayer } from '@/lib/contract';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
@@ -27,10 +26,6 @@ jest.mock('@/lib/stellar', () => ({
 
 jest.mock('@/hooks/useWallet', () => ({
   useWallet: jest.fn(),
-}));
-
-jest.mock('@/hooks/useIPFSUpload', () => ({
-  useIPFSUpload: jest.fn(),
 }));
 
 jest.mock('@/hooks/useIsPaused', () => ({
@@ -66,9 +61,6 @@ jest.mock('@/components/ui/VideoUpload', () => ({
 }));
 
 const mockedUseWallet = useWallet as jest.MockedFunction<typeof useWallet>;
-const mockedUseIPFSUpload = useIPFSUpload as jest.MockedFunction<
-  typeof useIPFSUpload
->;
 const mockedBuildRegisterPlayer = buildRegisterPlayer as jest.MockedFunction<
   typeof buildRegisterPlayer
 >;
@@ -92,21 +84,8 @@ function setupWallet(overrides: Partial<ReturnType<typeof useWallet>> = {}) {
   } as any);
 }
 
-function setupIPFSUpload(
-  overrides: Partial<ReturnType<typeof useIPFSUpload>> = {},
-) {
-  mockedUseIPFSUpload.mockReturnValue({
-    upload: jest.fn().mockResolvedValue('QmTestCID1234567890'),
-    progress: 0,
-    uploading: false,
-    error: null,
-    ...overrides,
-  });
-}
-
 function renderForm(onSuccess = jest.fn()) {
   setupWallet();
-  setupIPFSUpload();
   return render(<PlayerProfileForm onSuccess={onSuccess} />);
 }
 
@@ -265,7 +244,6 @@ describe('PlayerProfileForm', () => {
   // ── Submit button disabled during operations ───────────────────────────────────
 
   it('disables submit button while upload is in progress', async () => {
-    setupIPFSUpload({ uploading: true });
     renderForm();
 
     await act(async () => fillStep1AndAdvance());
@@ -313,7 +291,6 @@ describe('PlayerProfileForm', () => {
     mockedBuildRegisterPlayer.mockResolvedValue('mock-xdr');
     const onSuccess = jest.fn();
     setupWallet();
-    setupIPFSUpload();
 
     render(<PlayerProfileForm onSuccess={onSuccess} />);
 

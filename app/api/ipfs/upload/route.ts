@@ -9,6 +9,7 @@ import {
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { getSessionWallet } from '@/lib/session';
 import { createRequestLogger } from '@/lib/logger';
+import { upstreamStatus } from '@/lib/httpClient';
 import { withOutboundSpan, withRouteTelemetry } from '@/lib/telemetry';
 import {
   getPinataCredentials,

@@ -10,6 +10,7 @@ import {
 import {
   buildStreamingMultipartBody,
   streamFileBytes,
+  pinStreamedFileToIPFS,
 } from '@/lib/streamingMultipart';
 import {
   detectFileType,
@@ -19,6 +20,7 @@ import {
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import { getSessionWallet } from '@/lib/session';
 import { createRequestLogger } from '@/lib/logger';
+import { upstreamStatus } from '@/lib/httpClient';
 import { withOutboundSpan, withRouteTelemetry } from '@/lib/telemetry';
 import {
   getPinataCredentials,
@@ -224,72 +226,7 @@ async function postCompleteUpload(req: NextRequest) {
   return privateJson({ cid });
 }
 
-/**
- * Streams one multipart file part to Pinata's `pinFileToIPFS` and returns
- * the resulting `IpfsHash`. Uses global fetch with `duplex: 'half'` so the
- * request body is the lazily-pulled chunk stream — axios would buffer the
- * whole body before sending.
- *
- * Exported for tests: `__pinStreamedFileToIPFSForTests` overrides the
- * network hop (drain the stream + return a canned CID) while still proving
- * the route streamed the exact file bytes.
- */
-export async function pinStreamedFileToIPFS(assembly: {
-  filename: string;
-  fileType: string;
-  totalBytes: number;
-  chunks: () => Generator<Buffer, void, void>;
-}): Promise<string> {
-  const override = (globalThis as unknown as Record<string, unknown>)
-    .__pinStreamedFileToIPFSForTests as
-    | ((assembly: {
-        filename: string;
-        fileType: string;
-        totalBytes: number;
-        chunks: () => Generator<Buffer, void, void>;
-      }) => Promise<string>)
-    | undefined;
-  if (override) return override(assembly);
 
-  const boundary = `----promiscope-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-  const { stream, contentLength, contentType } = buildStreamingMultipartBody(
-    boundary,
-    assembly.filename,
-    assembly.fileType,
-    assembly.totalBytes,
-    assembly.chunks,
-  );
-  const res = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
-    method: 'POST',
-    headers: {
-      'Content-Type': contentType,
-      'Content-Length': String(contentLength),
-      pinata_api_key: process.env.PINATA_API_KEY ?? '',
-      pinata_secret_api_key: process.env.PINATA_SECRET ?? '',
-    },
-    body: stream as unknown as BodyInit,
-    duplex: 'half',
-  } as RequestInit & { duplex: 'half' });
-  if (!res.ok) {
-    throw new Error(`Pinata upload failed with status ${res.status}`);
-  }
-  const data = (await res.json()) as { IpfsHash?: string };
-  if (!data.IpfsHash) {
-    throw new Error('Pinata response missing IpfsHash');
-  }
-  return data.IpfsHash;
-}
-
-/** Test helper: drains the streamed file bytes (no framing) into memory. */
-export async function collectStreamedFileBytes(
-  chunks: () => Generator<Buffer, void, void>,
-): Promise<Buffer> {
-  const pieces: Uint8Array[] = [];
-  for await (const piece of streamFileBytes(chunks)) {
-    pieces.push(piece);
-  }
-  return Buffer.concat(pieces);
-}
 export const POST = withRouteTelemetry(
   postCompleteUpload,
   '/api/ipfs/upload/complete',

@@ -164,7 +164,9 @@ describe('ReferralPanel CSV export', () => {
     const codes = Array.from({ length: 6 }, (_, i) => makeCode(`CODE${i + 1}`));
     const firstCode = codes[0].code;
     const finalCode = codes[codes.length - 1].code;
-    const createObjectURLSpy = jest.fn(() => 'blob:referral-export');
+    const createObjectURLSpy = jest.fn(
+      (_obj: Blob | MediaSource) => 'blob:referral-export',
+    );
     const revokeObjectURLSpy = jest.fn();
     const clickSpy = jest
       .spyOn(HTMLAnchorElement.prototype, 'click')
@@ -235,7 +237,7 @@ describe('ReferralPanel CSV export', () => {
         ).createObjectURL = originalCreateObjectURL;
       } else {
         delete (
-          window.URL as typeof window.URL & {
+          window.URL as unknown as {
             createObjectURL?: typeof URL.createObjectURL;
           }
         ).createObjectURL;
@@ -249,7 +251,7 @@ describe('ReferralPanel CSV export', () => {
         ).revokeObjectURL = originalRevokeObjectURL;
       } else {
         delete (
-          window.URL as typeof window.URL & {
+          window.URL as unknown as {
             revokeObjectURL?: typeof URL.revokeObjectURL;
           }
         ).revokeObjectURL;

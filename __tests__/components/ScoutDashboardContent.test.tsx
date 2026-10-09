@@ -99,11 +99,11 @@ jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<
       string,
-      (params?: { count?: number }) => string
+      ((params?: { count?: number }) => string) | undefined
     > = {
       'scout_dashboard.no_players': () => 'No players found',
-      'scout_dashboard.players_found': ({ count }: { count: number }) =>
-        `${count} ${count === 1 ? 'player' : 'players'} found`,
+      'scout_dashboard.players_found': (params?: { count?: number }) =>
+        `${params?.count ?? 0} ${params?.count === 1 ? 'player' : 'players'} found`,
     };
     const t = translations[key];
     return t ? t : (key: string) => key;
@@ -221,13 +221,14 @@ jest.mock('@/hooks/useRecentlyViewed', () => ({
 
 import ScoutDashboardContent from '@/components/scout/ScoutDashboardContent';
 import { getPlayer } from '@/lib/contract';
+import type { Player } from '@/types';
 
 const mockGetPlayer = getPlayer as jest.Mock;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const EMPTY_SCOUT = {
-  players: [],
+  players: [] as Player[],
   // Server-side match count from the indexer (issue #1298). The results
   // header renders this rather than `players.length`, because `players`
   // only holds the pages fetched so far while `total` counts every match.
@@ -235,7 +236,7 @@ const EMPTY_SCOUT = {
   loading: false,
   error: null,
   isRateLimited: false,
-  retryAfterSec: null,
+  retryAfterSec: null as number | null,
   hasNextPage: false,
   loadMore: jest.fn(),
   searchId: 0,
@@ -278,7 +279,7 @@ beforeEach(() => {
   mockUseRecentlyViewed.mockReturnValue({ entries: [], record: jest.fn() });
 });
 
-function makePlayer(id: string) {
+function makePlayer(id: string): Player {
   return {
     id,
     wallet: `G${'A'.repeat(55)}`,

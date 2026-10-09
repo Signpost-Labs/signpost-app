@@ -242,7 +242,7 @@ describe('token TTL environment overrides', () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalNodeEnv;
+    Object.assign(process.env, { NODE_ENV: originalNodeEnv });
     for (const name of TTL_VARS) delete process.env[name];
     jest.resetModules();
   });
@@ -288,7 +288,7 @@ describe('token TTL environment overrides', () => {
   );
 
   it('ignores overrides entirely in production', () => {
-    process.env.NODE_ENV = 'production';
+    Object.assign(process.env, { NODE_ENV: 'production' });
     process.env.ACCESS_TOKEN_TTL_SEC = '10';
     process.env.DEFAULT_REFRESH_TTL_SEC = '90';
     process.env.REMEMBER_ME_REFRESH_TTL_SEC = '120';

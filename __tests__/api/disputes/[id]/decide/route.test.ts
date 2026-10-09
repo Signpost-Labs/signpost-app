@@ -7,6 +7,7 @@ import { SessionStore } from '@/lib/sessionStore';
 
 const ADMIN = 'GADMIN0000000000000000000000000000000000000000000000000';
 const SCOUT = 'GSCOUT0000000000000000000000000000000000000000000000000';
+const VALIDATOR = 'GVALIDATOR0000000000000000000000000000000000000000000000000';
 
 let sidCounter = 0;
 
@@ -37,6 +38,7 @@ function makeRequest(
 function createPendingDispute() {
   return MilestoneDisputeStore.getInstance().create({
     playerId: 'p1',
+    validatorWallet: VALIDATOR,
     playerWallet: SCOUT,
     milestoneId: 'm1',
     milestoneDescription: 'desc',

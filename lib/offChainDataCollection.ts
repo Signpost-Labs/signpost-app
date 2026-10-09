@@ -150,6 +150,8 @@ export interface CollectedUserData {
     sessions: SessionRow[];
     milestoneEndorsements: MilestoneEndorsement[];
     trackedUploads: TrackedUpload[];
+    /** Present only when the backend data service is configured. */
+    backend?: BackendUserData;
   };
   /**
    * On-chain data is explicitly NOT part of this export (it is immutable and

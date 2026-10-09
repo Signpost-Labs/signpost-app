@@ -58,7 +58,7 @@ function rawDatabaseBytes(): string {
   const files = fs
     .readdirSync(dbDir)
     .filter((f) => f.startsWith('contact-vault.db'))
-    .map((f) => fs.readFileSync(path.join(dbDir, f)));
+    .map((f) => new Uint8Array(fs.readFileSync(path.join(dbDir, f))));
   return Buffer.concat(files).toString('binary');
 }
 

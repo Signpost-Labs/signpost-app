@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -7,6 +7,9 @@ import { useTranslations } from 'next-intl';
 import { useRequireWallet } from '@/hooks/useRequireWallet';
 import { useRequireSubscription } from '@/hooks/useRequireSubscription';
 import { useScout } from '@/hooks/useScout';
+import { useScoutDashboardFilters } from '@/hooks/useScoutDashboardFilters';
+import { useMilestonesBatch } from '@/hooks/useMilestonesBatch';
+import { useSavedSearchNewCount } from '@/hooks/useSavedSearches';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { useWatchlist } from '@/hooks/useWatchlist';
@@ -23,12 +26,15 @@ import SpendingSummary from '@/components/scout/SpendingSummary';
 import OnboardingTour from '@/components/ui/OnboardingTour';
 import { getTourSteps, SCOUT_TOUR_ID } from '@/lib/tourSteps';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import type { Player, PlayerFilter } from '@/types';
+import type { Milestone, Player, PlayerFilter } from '@/types';
 import PullToRefresh from '@/components/ui/PullToRefresh';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import VirtualizedPlayerGrid from '@/components/scout/VirtualizedPlayerGrid';
 import ExportContactsCsvButton from '@/components/scout/ExportContactsCsvButton';
 import Select from '@/components/ui/Select';
+import EmptyState from '@/components/ui/EmptyState';
+import PlayerCardSkeleton from '@/components/PlayerCardSkeleton';
+import SubscriptionStatusBanner from '@/components/scout/SubscriptionStatusBanner';
 import {
   PLAYER_SORT_OPTIONS,
   parsePlayerSort,
@@ -141,8 +147,9 @@ export default function ScoutDashboardContent() {
   const recentlyViewed = useRecentlyViewed();
   const { show: showToast } = useToast();
   const [now, setNow] = useState(() => Date.now());
-  const [remainingSec, setRemainingSec] = useState<number | null>(null);
   const [searchAnnouncement, setSearchAnnouncement] = useState<string>('');
+  const [renamingId, setRenamingId] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState('');
 
   const filters = useScoutDashboardFilters({
     loading,
@@ -151,30 +158,19 @@ export default function ScoutDashboardContent() {
     search,
     searchByName,
   });
-  const { compareIds, toggleCompare, handleSearch } = filters;
+  const {
+    nameQuery,
+    setNameQuery,
+    remainingSec,
+    searchHasCompleted,
+    showSkeletons,
+    handleSearch,
+    handleClearFilters,
+    compareIds,
+    toggleCompare,
+  } = filters;
   const showCompareBar = compareIds.length >= 2;
   const compareLimitReached = compareIds.length >= MAX_COMPARE_PLAYERS;
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const currentIds = params.get('ids');
-    const nextIds = compareIds.join(',');
-
-    if (compareIds.length === 0 && !currentIds) return;
-    if (compareIds.length === 0) {
-      if (currentIds) {
-        params.delete('ids');
-        router.replace(`?${params.toString()}`);
-      }
-      return;
-    }
-
-    if (currentIds !== nextIds) {
-      params.set('ids', nextIds);
-      const nextQuery = params.toString().replace(/%2C/gi, ',');
-      router.replace(nextQuery ? `?${nextQuery}` : '?');
-    }
-  }, [compareIds, router, searchParams]);
 
   const [walletQuery, setWalletQuery] = useState('');
   const [searchResult, setSearchResult] = useState<
@@ -182,9 +178,6 @@ export default function ScoutDashboardContent() {
   >(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const [nameQuery, setNameQuery] = useState('');
-  const debouncedName = useDebounce(nameQuery, 300);
 
   // Keyboard-accessible pagination is preserved as a first-class navigation
   // mode alongside real scroll virtualization: `players` is fully in memory
@@ -233,15 +226,6 @@ export default function ScoutDashboardContent() {
   }
 
   useEffect(() => {
-    if (loading) {
-      loadingEverStarted.current = true;
-    } else if (loadingEverStarted.current) {
-      hasLoaded.current = true;
-      setSearchHasCompleted(true);
-    }
-  }, [loading]);
-
-  useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (!walletQuery) {
@@ -271,16 +255,6 @@ export default function ScoutDashboardContent() {
     };
   }, [walletQuery]);
 
-  useEffect(() => {
-    if (debouncedName) {
-      hasLoaded.current = false;
-      setSearchHasCompleted(false);
-      searchByName(debouncedName);
-    } else {
-      searchByName('');
-    }
-  }, [debouncedName, searchByName]);
-
   // Announce search results after debounce and fetch resolves
   useEffect(() => {
     if (!searchHasCompleted || nameQuery === '') {
@@ -295,43 +269,6 @@ export default function ScoutDashboardContent() {
       setSearchAnnouncement(t('players_found', { count: players.length }));
     }
   }, [searchHasCompleted, players.length, nameQuery, t]);
-
-  const handleSearch = useCallback(
-    (filter: PlayerFilter) => {
-      setNameQuery('');
-      hasLoaded.current = false;
-      search(filter);
-    },
-    [search],
-  );
-
-  const toggleCompare = useCallback(
-    (playerId: string) => {
-      setCompareIds((prev) => {
-        if (prev.includes(playerId)) {
-          return prev.filter((id) => id !== playerId);
-        }
-        if (prev.length >= MAX_COMPARE_PLAYERS) {
-          showToast({
-            message: `Maximum ${MAX_COMPARE_PLAYERS} players for comparison`,
-            variant: 'info',
-          });
-          return prev;
-        }
-        return [...prev, playerId];
-      });
-    },
-    [showToast],
-  );
-
-  const handleClearCompare = useCallback(() => {
-    setCompareIds([]);
-  }, []);
-
-  const handleClearFilters = useCallback(() => {
-    setNameQuery('');
-    setResetKey((k) => k + 1);
-  }, []);
 
   const handleToggleWatchlist = useCallback(
     (targetPlayer: Player) => {

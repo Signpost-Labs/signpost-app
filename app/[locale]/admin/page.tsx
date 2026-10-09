@@ -5,14 +5,23 @@ import { useWallet } from '@/hooks/useWallet';
 import { useToast } from '@/components/ui/Toast';
 import EmptyState from '@/components/ui/EmptyState';
 import { recordAuditEntry } from '@/lib/adminAuditClient';
-import { buildPauseContract, buildUnpauseContract } from '@/lib/contract';
+import { buildPauseContract, buildUnpauseContract, buildRemoveValidator } from '@/lib/contract';
 import {
   fetchActivityEvents,
+  getReferralOverview,
   type ActivityEvent,
   type ActivityEventType,
 } from '@/lib/api';
+import type { ReferralOverview } from '@/types';
 import TruncatedAddress from '@/components/ui/TruncatedAddress';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import ConfigStatus from '@/components/admin/ConfigStatus';
+import FeeRevenueChart from '@/components/admin/FeeRevenueChart';
+import AdminAuditLog from '@/components/admin/AdminAuditLog';
+import ValidatorActionLog from '@/components/admin/ValidatorActionLog';
+import AutomatedModerationLog from '@/components/admin/AutomatedModerationLog';
+import FraudFlagsPanel from '@/components/admin/FraudFlagsPanel';
+import DisputedMilestonesPanel from '@/components/admin/DisputedMilestonesPanel';
 import FraudFlagsStalenessBadge from '@/components/admin/FraudFlagsStalenessBadge';
 import AdminLoadError from '@/components/admin/AdminLoadError';
 import { useAdminConfirm } from '@/components/admin/useAdminConfirm';
@@ -68,7 +77,7 @@ export default function AdminOverviewPage() {
   const { show } = useToast();
   const { paused, setPaused, loading, fetchError, reload } =
     useAdminContractState();
-  const { confirm, dialog } = useAdminConfirm();
+  const { confirm, dialog: confirmDialog } = useAdminConfirm();
 
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const [activityTotal, setActivityTotal] = useState(0);
@@ -107,6 +116,55 @@ export default function AdminOverviewPage() {
       )
       .finally(() => setActivityLoading(false));
   }, [activityPage, show]);
+
+  const [referralOverview, setReferralOverview] =
+    useState<ReferralOverview | null>(null);
+  const [referralLoading, setReferralLoading] = useState(false);
+
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<{
+    action: 'remove';
+    label: string;
+    message: string;
+  } | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  useEffect(() => {
+    setReferralLoading(true);
+    getReferralOverview()
+      .then(setReferralOverview)
+      .catch(() =>
+        show({
+          message: 'Failed to load referral program data.',
+          variant: 'error',
+        }),
+      )
+      .finally(() => setReferralLoading(false));
+  }, [show]);
+
+  async function execAction(action: 'remove') {
+    if (action !== 'remove' || !removeTarget || !publicKey) return;
+    const address = removeTarget;
+    setActionLoading(true);
+    try {
+      const txHash = await signAndSubmit(
+        await buildRemoveValidator(publicKey, address),
+      );
+      recordAuditEntry({
+        actionType: 'validator_remove',
+        target: address,
+        txHash,
+        status: 'submitted',
+      }).catch(() => {});
+      show({ message: 'Validator removed.', variant: 'success' });
+    } catch {
+      show({ message: 'Failed to remove validator.', variant: 'error' });
+    } finally {
+      setActionLoading(false);
+      setDialog(null);
+      setRemoveTarget(null);
+    }
+  }
 
   function togglePause() {
     if (!publicKey) return;
@@ -353,6 +411,8 @@ export default function AdminOverviewPage() {
       />
 
       <DisputedMilestonesPanel />
+
+      {confirmDialog}
 
       {dialog && (
         <ConfirmDialog

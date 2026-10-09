@@ -131,6 +131,8 @@ export interface ActivityEvent {
   timestamp: number;
   actor: string;
   subjectId?: string;
+  /** Ledger sequence the event occurred in, when known. Used for incremental processing checkpoints. */
+  ledger?: number;
 }
 
 export const fetchActivityEvents = (

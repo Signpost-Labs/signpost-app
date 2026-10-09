@@ -10,12 +10,16 @@ import AcademyQuorumBadge from '@/components/player/AcademyQuorumBadge';
 
 const DISPUTE_STATUS_LABEL: Record<MilestoneDispute['status'], string> = {
   pending: 'Dispute pending review',
+  under_review: 'Dispute under review — validator responded',
+  escalated: 'Dispute escalated — awaiting decision',
   upheld: 'Dispute reviewed — decision upheld',
   reversed: 'Dispute reviewed — milestone reversed',
 };
 
 const DISPUTE_STATUS_COLOUR: Record<MilestoneDispute['status'], string> = {
   pending: 'text-amber-400',
+  under_review: 'text-blue-400',
+  escalated: 'text-red-400',
   upheld: 'text-gray-400',
   reversed: 'text-red-400',
 };

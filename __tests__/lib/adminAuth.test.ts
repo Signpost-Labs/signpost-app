@@ -34,19 +34,22 @@ describe('requireAdminWallet', () => {
   function createMockRequest(cookieValue: string | null): NextRequest {
     const req = new NextRequest('http://localhost:3000/api/admin/test');
 
-    // Override cookies
-    req.cookies = {
-      get: jest.fn((name: string) => {
-        if (name === 'session' && cookieValue) {
-          return { name: 'session', value: cookieValue };
-        }
-        return undefined;
-      }),
-      getAll: jest.fn(() => []),
-      set: jest.fn(),
-      delete: jest.fn(),
-      has: jest.fn((name: string) => name === 'session' && !!cookieValue),
-    };
+    // Override cookies (read-only on NextRequest, so define it directly)
+    Object.defineProperty(req, 'cookies', {
+      value: {
+        get: jest.fn((name: string) => {
+          if (name === 'session' && cookieValue) {
+            return { name: 'session', value: cookieValue };
+          }
+          return undefined;
+        }),
+        getAll: jest.fn(() => []),
+        set: jest.fn(),
+        delete: jest.fn(),
+        has: jest.fn((name: string) => name === 'session' && !!cookieValue),
+      },
+      configurable: true,
+    });
 
     return req;
   }

@@ -19,6 +19,7 @@ const mockGetMilestoneHistory = getMilestoneHistory as jest.MockedFunction<
 
 const ADMIN = 'GADMIN0000000000000000000000000000000000000000000000000';
 const SCOUT = 'GSCOUT0000000000000000000000000000000000000000000000000';
+const VALIDATOR = 'GVALIDATOR0000000000000000000000000000000000000000000000000';
 const OTHER = 'GOTHER0000000000000000000000000000000000000000000000000';
 
 let sidCounter = 0;
@@ -110,6 +111,7 @@ describe('GET /api/disputes', () => {
   it('scopes results to the requesting wallet for non-admins', async () => {
     MilestoneDisputeStore.getInstance().create({
       playerId: 'p1',
+      validatorWallet: VALIDATOR,
       playerWallet: SCOUT,
       milestoneId: 'm1',
       milestoneDescription: 'desc',
@@ -117,6 +119,7 @@ describe('GET /api/disputes', () => {
     });
     MilestoneDisputeStore.getInstance().create({
       playerId: 'p2',
+      validatorWallet: VALIDATOR,
       playerWallet: OTHER,
       milestoneId: 'm2',
       milestoneDescription: 'desc',
@@ -135,6 +138,7 @@ describe('GET /api/disputes', () => {
   it('returns the full queue for admins, optionally filtered by status', async () => {
     MilestoneDisputeStore.getInstance().create({
       playerId: 'p1',
+      validatorWallet: VALIDATOR,
       playerWallet: SCOUT,
       milestoneId: 'm1',
       milestoneDescription: 'desc',
@@ -142,6 +146,7 @@ describe('GET /api/disputes', () => {
     });
     MilestoneDisputeStore.getInstance().create({
       playerId: 'p2',
+      validatorWallet: VALIDATOR,
       playerWallet: OTHER,
       milestoneId: 'm2',
       milestoneDescription: 'desc',
@@ -160,6 +165,7 @@ describe('GET /api/disputes', () => {
     const store = MilestoneDisputeStore.getInstance();
     const d = store.create({
       playerId: 'p1',
+      validatorWallet: VALIDATOR,
       playerWallet: SCOUT,
       milestoneId: 'm1',
       milestoneDescription: 'desc',
@@ -173,6 +179,7 @@ describe('GET /api/disputes', () => {
     });
     store.create({
       playerId: 'p2',
+      validatorWallet: VALIDATOR,
       playerWallet: OTHER,
       milestoneId: 'm2',
       milestoneDescription: 'desc',
@@ -405,6 +412,7 @@ describe('POST /api/disputes', () => {
   it('returns 409 for a duplicate open dispute on the same milestone', async () => {
     MilestoneDisputeStore.getInstance().create({
       playerId: 'p1',
+      validatorWallet: VALIDATOR,
       playerWallet: SCOUT,
       milestoneId: 'm1',
       milestoneDescription: 'Real on-chain description',

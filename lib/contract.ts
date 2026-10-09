@@ -17,6 +17,7 @@ import {
   nativeToScVal,
   scValToNative,
   xdr,
+  Operation,
   TransactionBuilder as TB,
   Account,
   StrKey,
@@ -300,7 +301,7 @@ async function buildTx(
       networkPassphrase: NETWORK,
     })
       .setSorobanData(simulation.restorePreamble.transactionData.build())
-      .addOperation(xdr.Operation.restoreFootprint({}))
+      .addOperation(Operation.restoreFootprint({}))
       .setTimeout(30)
       .build();
 

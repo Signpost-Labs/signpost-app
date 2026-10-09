@@ -27,17 +27,14 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
-  typescript: {
-    // `next build` runs its own project-wide type check by default, but this
-    // repo's CI only gates on `npm run lint` / `npm run test` (see
-    // .github/workflows/ci.yml) — `npm run typecheck` (tsc --noEmit) isn't a
-    // CI gate today, so unrelated pre-existing type errors elsewhere in the
-    // project can otherwise block `next build` for a change that never
-    // touched those files (this is what broke the Docker image build added
-    // in #675). `npm run typecheck` still surfaces these for anyone who runs
-    // it directly; fixing the underlying errors is tracked separately.
-    ignoreBuildErrors: true,
-  },
+  // TypeScript: `next build` runs its own project-wide type check by default
+  // and fails the build on type errors — there is deliberately no
+  // `typescript.ignoreBuildErrors` here. CI enforces this twice (see
+  // .github/workflows/ci.yml): the `lint` job runs `npm run type-check`
+  // (tsc --noEmit on tsconfig.typecheck.json, which covers app/library code
+  // but excludes tests, e2e/ and stories), and the `build` job runs
+  // `npm run build`, whose built-in check covers the whole project. Keep
+  // both green: fix type errors instead of silencing them.
   images: {
     /**
      * remotePatterns replaces the deprecated `domains` array.

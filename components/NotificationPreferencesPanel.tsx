@@ -93,7 +93,7 @@ export default function NotificationPreferencesPanel() {
                 </p>
               </div>
               <Toggle
-                checked={preferences[key]}
+                checked={Boolean(preferences[key])}
                 onChange={() => toggle(key)}
                 label={label}
               />

@@ -27,6 +27,7 @@ jest.mock('@/lib/backendUserData', () => ({
 
 const WALLET = 'GDELETE000000000000000000000000000000000000000000000000000000';
 const OTHER = 'GOTHER0000000000000000000000000000000000000000000000000000000';
+const VALIDATOR = 'GVALIDATOR0000000000000000000000000000000000000000000000000';
 
 function makeRequest(wallet?: string): NextRequest {
   const headers: Record<string, string> = {};
@@ -76,6 +77,7 @@ describe('POST /api/data-deletion/request', () => {
     NotificationReadStore.getInstance().markRead(WALLET, [1, 2]);
     MilestoneDisputeStore.getInstance().create({
       playerId: 'player-1',
+      validatorWallet: VALIDATOR,
       playerWallet: WALLET,
       milestoneId: 'm-1',
       milestoneDescription: 'desc',

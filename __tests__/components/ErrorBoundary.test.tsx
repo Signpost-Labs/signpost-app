@@ -121,7 +121,13 @@ describe('ErrorBoundary', () => {
   // over-aggressive gating regression.
   it('hides error details when NODE_ENV=production', () => {
     const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    // process.env.NODE_ENV is typed read-only, so override it via
+    // defineProperty instead of assignment.
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      configurable: true,
+      writable: true,
+    });
     try {
       render(
         <ErrorBoundary>
@@ -143,7 +149,11 @@ describe('ErrorBoundary', () => {
         screen.queryByText(new RegExp(ERROR_MESSAGE)),
       ).not.toBeInTheDocument();
     } finally {
-      process.env.NODE_ENV = originalNodeEnv;
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalNodeEnv,
+        configurable: true,
+        writable: true,
+      });
     }
   });
 });

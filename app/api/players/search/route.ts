@@ -3,6 +3,7 @@ import { apiError, ApiErrorCode } from '@/lib/apiErrors';
 import axios from 'axios';
 import { createRequestLogger } from '@/lib/logger';
 import { getClientIp, checkRateLimit } from '@/lib/rateLimit';
+import { createClient, SEARCH_TIMEOUT_MS, upstreamStatus } from '@/lib/httpClient';
 import { withOutboundSpan, withRouteTelemetry } from '@/lib/telemetry';
 
 // Search names longer than this are likely abuse or mistake; never forward them.

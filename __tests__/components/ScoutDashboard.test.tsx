@@ -1,6 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import type { Player } from '@/types';
 
 // ── Globals ───────────────────────────────────────────────────────────────────
 
@@ -152,7 +153,7 @@ import ScoutDashboard from '@/app/[locale]/scout/page';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const EMPTY_SCOUT = {
-  players: [],
+  players: [] as Player[],
   total: 0,
   loading: false,
   error: null,
@@ -235,7 +236,7 @@ describe('ScoutDashboard — empty state', () => {
 
   it('does not show the empty state when the search returns players', () => {
     const { rerender } = render(<ScoutDashboard />);
-    const players = [
+    const players: Player[] = [
       {
         id: 'p1',
         wallet: 'G...',

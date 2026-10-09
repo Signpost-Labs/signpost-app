@@ -15,7 +15,7 @@ function xdrString(value: string): string {
   const buf = Buffer.alloc(5 + strBuf.length);
   buf.writeUInt8(3, 0);
   buf.writeUInt32BE(strBuf.length, 1);
-  strBuf.copy(buf, 5);
+  strBuf.copy(buf as unknown as Uint8Array, 5);
   return buf.toString('base64');
 }
 
@@ -37,7 +37,7 @@ function xdrStruct(fields: string[]): string {
   for (const fBuf of fieldBufs) {
     buf.writeUInt32BE(fBuf.length, offset);
     offset += 4;
-    fBuf.copy(buf, offset);
+    fBuf.copy(buf as unknown as Uint8Array, offset);
     offset += fBuf.length;
   }
   return buf.toString('base64');
@@ -113,7 +113,7 @@ export function mockSorobanRpc(page: Page, opts: SimulateOptions = {}): void {
 
     let body: Record<string, unknown> | null = null;
     try {
-      body = await route.request().json();
+      body = route.request().postDataJSON();
     } catch {
       await route.continue();
       return;

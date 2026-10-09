@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSessionWallet } from '@/lib/session';
 import { deleteUserData } from '@/lib/offChainDataCollection';
 import { createRequestLogger } from '@/lib/logger';

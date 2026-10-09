@@ -148,7 +148,7 @@ describe('buildRegisterPlayer', () => {
 
   test('restores an archived footprint before preparing the original transaction', async () => {
     mockRpc.simulateTransaction
-      .mockResolvedValueOnce({ result: { retval: {} } })
+      .mockResolvedValueOnce({ result: { retval: {} } } as any)
       .mockResolvedValueOnce({
         result: { retval: {} },
         restorePreamble: {

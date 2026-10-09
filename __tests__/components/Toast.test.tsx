@@ -135,7 +135,7 @@ describe('Toast notifications', () => {
       .getAllByRole('alert')
       .find((node) => node.textContent?.includes('Error message'));
     expect(errorToast).toBeDefined();
-    expect(errorToast).toHaveAttribute('role', 'alert');
+    expect(errorToast?.getAttribute('role')).toBe('alert');
 
     // Trigger a warning toast
     fireEvent.click(screen.getByText(/show warning/i));
@@ -143,7 +143,7 @@ describe('Toast notifications', () => {
       .getAllByRole('alert')
       .find((node) => node.textContent?.includes('Warning message'));
     expect(warningToast).toBeDefined();
-    expect(warningToast).toHaveAttribute('role', 'alert');
+    expect(warningToast?.getAttribute('role')).toBe('alert');
   });
 
   it('uses role="status" for success and info toasts', () => {
@@ -158,7 +158,7 @@ describe('Toast notifications', () => {
       .getAllByRole('status')
       .find((node) => node.textContent?.includes('Initial toast'));
     expect(infoToast).toBeDefined();
-    expect(infoToast).toHaveAttribute('role', 'status');
+    expect(infoToast?.getAttribute('role')).toBe('status');
 
     // Trigger a success toast
     fireEvent.click(screen.getByText(/show success/i));
@@ -166,7 +166,7 @@ describe('Toast notifications', () => {
       .getAllByRole('status')
       .find((node) => node.textContent?.includes('Success message'));
     expect(successToast).toBeDefined();
-    expect(successToast).toHaveAttribute('role', 'status');
+    expect(successToast?.getAttribute('role')).toBe('status');
   });
 
   it('close button is a <button> element with aria-label="Close notification"', () => {
@@ -180,8 +180,8 @@ describe('Toast notifications', () => {
       name: /close notification/i,
     });
     expect(closeButton.tagName).toBe('BUTTON');
-    expect(closeButton).toHaveAttribute('aria-label', 'Close notification');
-    expect(closeButton).toHaveAttribute('type', 'button');
+    expect(closeButton.getAttribute('aria-label')).toBe('Close notification');
+    expect(closeButton.getAttribute('type')).toBe('button');
   });
 
   it('automatically dismisses a toast after 4 seconds', () => {

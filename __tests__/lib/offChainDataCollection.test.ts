@@ -25,6 +25,7 @@ import type { PlayerFilter } from '@/types';
 
 const WALLET = 'GEXPORT0000000000000000000000000000000000000000000000000000000';
 const OTHER = 'GOTHER000000000000000000000000000000000000000000000000000000000';
+const VALIDATOR = 'GVALIDATOR0000000000000000000000000000000000000000000000000';
 
 function resetAll(): void {
   WatchlistStore.resetInstance();
@@ -54,6 +55,7 @@ describe('collectUserData', () => {
     NotificationReadStore.getInstance().markRead(WALLET, [1, 2]);
     MilestoneDisputeStore.getInstance().create({
       playerId: 'player-1',
+      validatorWallet: VALIDATOR,
       playerWallet: WALLET,
       milestoneId: 'm-1',
       milestoneDescription: 'desc',
@@ -123,6 +125,7 @@ describe('deleteUserData', () => {
     NotificationReadStore.getInstance().markRead(WALLET, [1, 2]);
     MilestoneDisputeStore.getInstance().create({
       playerId: 'player-1',
+      validatorWallet: VALIDATOR,
       playerWallet: WALLET,
       milestoneId: 'm-1',
       milestoneDescription: 'desc',

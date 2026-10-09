@@ -10,6 +10,7 @@ export type EventType =
   | 'player_contacted'
   | 'trial_offer_logged'
   | 'fees_withdrawn'
+  | 'profile_updated'
   | 'unknown';
 
 export interface DecodedSchemaEvent {
@@ -46,6 +47,7 @@ export const EVENT_SCHEMA_V1: Record<Exclude<EventType, 'unknown'>, EventDefinit
   player_contacted: define('player_contacted'),
   trial_offer_logged: define('trial_offer_logged'),
   fees_withdrawn: define('fees_withdrawn'),
+  profile_updated: define('profile_updated'),
 };
 
 function topicName(topic: xdr.ScVal | undefined): string | null {

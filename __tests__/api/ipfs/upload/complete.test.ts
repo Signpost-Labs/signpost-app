@@ -1,8 +1,6 @@
 /** @jest-environment node */
-import {
-  POST,
-  collectStreamedFileBytes,
-} from '@/app/api/ipfs/upload/complete/route';
+import { POST } from '@/app/api/ipfs/upload/complete/route';
+import { collectStreamedFileBytes } from '@/lib/streamingMultipart';
 import { NextRequest } from 'next/server';
 import {
   initSession,

@@ -161,7 +161,9 @@ describe('PlayerProfileLayout', () => {
       expect(metadata.openGraph?.url).toBe(
         'https://promiscope.example/en/player/player-abc-123',
       );
-      expect(metadata.openGraph?.type).toBe('profile');
+      expect(
+        (metadata.openGraph as { type?: string } | undefined)?.type,
+      ).toBe('profile');
     });
 
     it('returns empty metadata when fetch fails', async () => {

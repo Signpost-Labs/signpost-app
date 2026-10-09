@@ -80,14 +80,6 @@ function PlayerDashboardContent() {
   const isRegistered = !!player;
   const dataExportEnabled = isFeatureEnabled('DATA_EXPORT');
 
-  if (!loading && error === ARCHIVED_ENTRY_MESSAGE) {
-    return (
-      <p className="mx-auto mt-20 max-w-xl px-6 text-center text-yellow-300">
-        {ARCHIVED_ENTRY_MESSAGE}
-      </p>
-    );
-  }
-
   const [activeTab, setActiveTab] = useState<TabId>(
     isRegistered ? 'profile' : 'register',
   );
@@ -289,6 +281,14 @@ function PlayerDashboardContent() {
     },
     [publicKey, optimisticUpdate, refetch],
   );
+
+  if (!loading && error === ARCHIVED_ENTRY_MESSAGE) {
+    return (
+      <p className="mx-auto mt-20 max-w-xl px-6 text-center text-yellow-300">
+        {ARCHIVED_ENTRY_MESSAGE}
+      </p>
+    );
+  }
 
   if (!publicKey) {
     return null; // Redirect handled by useRequireWallet

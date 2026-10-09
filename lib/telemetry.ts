@@ -57,7 +57,15 @@ export function withRouteTelemetry<
       },
       async (span) => {
         try {
-          const response = await handler(request, context);
+          // `T` is constrained by `(...args: never[]) => ...`, so calling
+          // `handler` directly sees its parameters as `never`. Invoke it
+          // through its real parameter types instead — this is exactly the
+          // signature the wrapper itself accepts, so the call is sound.
+          const invoke = handler as unknown as (
+            request: Parameters<T>[0],
+            context?: Parameters<T>[1],
+          ) => ReturnType<T>;
+          const response = await invoke(request, context);
           const durationMs = Math.round(performance.now() - startedAt);
           span.setAttribute('http.status_class', statusClass(response.status));
           span.setAttribute('http.duration_ms', durationMs);
@@ -79,7 +87,11 @@ export function withRouteTelemetry<
         }
       },
     ) as ReturnType<T>;
-  }) as T;
+    // The wrapper takes `Parameters<T>[0]` / `Parameters<T>[1]` and returns
+    // `ReturnType<T>`, so it is call-compatible with `T`; the compiler cannot
+    // prove that through the `never[]`-based constraint, hence the narrow
+    // cast via `unknown`.
+  }) as unknown as T;
 
   return wrapped;
 }

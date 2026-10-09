@@ -18,7 +18,7 @@ describe('SettingsLoading', () => {
   });
 
   it('renders skeleton sections matching the settings page layout', () => {
-    render(<SettingsLoading />);
+    const { container } = render(<SettingsLoading />);
 
     // Header section
     const header = container?.querySelector('section');

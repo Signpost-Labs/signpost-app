@@ -148,7 +148,7 @@ describe('useScout', () => {
 
   test('SearchRateLimitedError from the name-search backend surfaces isRateLimited + retryAfterSec', async () => {
     mockSearchPlayersByName.mockRejectedValueOnce(
-      new SearchRateLimitedError('slow down', 42),
+      new SearchRateLimitedError(42),
     );
 
     const { result } = renderHook(() => useScout(), { wrapper });
