@@ -1,0 +1,24 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "main",
+    "origin",
+    "wave/reland-103",
+    "wave/reland-106",
+    "wave/reland-107"
+  ],
+  "parent": {
+    "main": null,
+    "origin": "main",
+    "wave/reland-103": "main",
+    "wave/reland-106": "main",
+    "wave/reland-107": "main"
+  },
+  "order": [
+    "main",
+    "origin",
+    "wave/reland-103",
+    "wave/reland-106",
+    "wave/reland-107"
+  ]
+}
