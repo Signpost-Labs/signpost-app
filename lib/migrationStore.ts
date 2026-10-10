@@ -25,6 +25,7 @@
 
 import type Database from 'better-sqlite3';
 import { openSqliteDb } from './sqliteDb';
+import type { Migration } from './sqliteMigrations';
 
 export type MigrationStatus =
   | 'pending'
@@ -50,7 +51,12 @@ export interface MigrationRequest {
   failureReason: string | null;
 }
 
-const SCHEMA = `
+const migrations: Migration[] = [
+  {
+    version: 1,
+    name: 'wallet migration requests',
+    up(db) {
+      db.exec(`
 CREATE TABLE IF NOT EXISTS migration_requests (
   id TEXT PRIMARY KEY,
   from_wallet TEXT NOT NULL,
@@ -66,7 +72,11 @@ CREATE TABLE IF NOT EXISTS migration_requests (
 CREATE INDEX IF NOT EXISTS idx_migration_from_wallet ON migration_requests(from_wallet);
 CREATE INDEX IF NOT EXISTS idx_migration_to_wallet ON migration_requests(to_wallet);
 CREATE INDEX IF NOT EXISTS idx_migration_status ON migration_requests(status);
-`;
+CREATE INDEX IF NOT EXISTS idx_migration_execute_after ON migration_requests(execute_after);
+`);
+    },
+  },
+];
 
 interface MigrationRow {
   id: string;
@@ -102,13 +112,16 @@ export class MigrationStore {
 
   private constructor(db: Database.Database) {
     this.db = db;
-    this.db.exec(SCHEMA);
   }
 
   static getInstance(): MigrationStore {
     if (!MigrationStore._instance) {
       MigrationStore._instance = new MigrationStore(
-        openSqliteDb('migration-requests.db', 'MIGRATION_REQUESTS_DB_PATH'),
+        openSqliteDb(
+          'migration-requests.db',
+          'MIGRATION_REQUESTS_DB_PATH',
+          migrations,
+        ),
       );
     }
     return MigrationStore._instance;
