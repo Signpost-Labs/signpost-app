@@ -6,9 +6,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node api.js && next dev",
+    "build": "node api.js && next build",
+    "start": "node api.js && next start",
     "lint": "next lint",
     "test": "jest --passWithNoTests --maxWorkers=2 --workerIdleMemoryLimit=512MB",
     "test:integration": "jest --config=jest.integration.config.js --runInBand",
