@@ -4,6 +4,7 @@ import { requireAdminWallet } from '@/lib/adminAuth';
 import { MilestoneDisputeStore } from '@/lib/milestoneDisputeStore';
 import { checkIsValidator } from '@/lib/contract';
 import { createRequestLogger } from '@/lib/logger';
+import { isValidCid } from '@/lib/cid';
 import {
   sanitizeTextInput,
   validateTextField,
@@ -77,7 +78,16 @@ export async function POST(
       { status: 400 },
     );
   }
-  if (typeof ipfsMimeType !== 'string' || !ALLOWED_MIME_TYPES.has(ipfsMimeType)) {
+  if (!isValidCid(ipfsHash.trim())) {
+    return NextResponse.json(
+      { error: 'ipfsHash must be a valid IPFS CID' },
+      { status: 400 },
+    );
+  }
+  if (
+    typeof ipfsMimeType !== 'string' ||
+    !ALLOWED_MIME_TYPES.has(ipfsMimeType)
+  ) {
     return NextResponse.json(
       {
         error: `ipfsMimeType must be one of: ${[...ALLOWED_MIME_TYPES].join(', ')}`,
