@@ -11,14 +11,12 @@ yarn.lock
 pnpm-lock.yaml
 .husky/_
 /.git
-.vscode
 public/sw.js
 public/workbox-*.js
 # next-pwa regenerates sourcemaps adjacent to workbox output on local builds
 public/sw.js.map
 public/workbox-*.js.map
 
-.env.local
 .env*.local
 *.tsbuildinfo
 # Jest coverage output (issue #108)
@@ -128,3 +126,4 @@ yarn-error.log*
 .wasm-cache/
 # Integration test output reports
 integration-test-results/
+config.bat

@@ -114,15 +114,8 @@ function connectLeader(wallet?: string): void {
     }, HEARTBEAT_TIMEOUT_MS);
   }
 
-  const headers: Record<string, string> = {};
-  if (lastEventId !== null) {
-    headers['Last-Event-ID'] = String(lastEventId);
-  }
-
-  // EventSource doesn't support custom headers natively; we use the URL
-  // for Last-Event-ID fallback via query param as a polyfill for proxies
-  // that strip the header, but prefer the standard header via a thin fetch
-  // polyfill if available.
+  // EventSource doesn't support custom headers; resume via the lastEventId
+  // query parameter when reconnecting.
   source = new EventSource(
     lastEventId !== null ? `${url}&lastEventId=${lastEventId}` : url,
   );
