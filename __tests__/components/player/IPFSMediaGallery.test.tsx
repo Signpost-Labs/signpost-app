@@ -21,13 +21,15 @@ jest.mock('next/image', () => ({
     src,
     alt,
     className,
+    loading,
   }: {
     src: string;
     alt: string;
     className?: string;
+    loading?: 'eager' | 'lazy';
   }) => (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} className={className} />
+    <img src={src} alt={alt} className={className} loading={loading} />
   ),
 }));
 
@@ -106,6 +108,7 @@ describe('IPFSMediaGallery', () => {
     render(<IPFSMediaGallery cids={['QmImageCid123']} />);
     const img = screen.getByAltText('IPFS media QmImageCid123');
     expect(img).toHaveAttribute('src', '/api/media/QmImageCid123');
+    expect(img).toHaveAttribute('loading', 'lazy');
   });
 
   it('renders a grid of tiles, one per CID', () => {
@@ -122,6 +125,7 @@ describe('IPFSMediaGallery', () => {
     const { container } = render(<IPFSMediaGallery cids={['QmClip.mp4']} />);
     const video = container.querySelector('video');
     expect(video).toBeInTheDocument();
+    expect(video).toHaveAttribute('preload', 'none');
     // No broken-image guess (e.g. swapping the extension for a file that
     // doesn't exist on IPFS) — absent until useVideoPosterFrame resolves one.
     expect(video).not.toHaveAttribute('poster');

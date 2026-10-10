@@ -235,6 +235,7 @@ function IPFSMediaItem({ cid }: IPFSMediaItemProps) {
           ref={videoRef}
           className="w-full h-full object-cover"
           poster={generatedPoster ?? undefined}
+          preload="none"
           controls
           onClick={() => setIsPlaying(!isPlaying)}
         >
@@ -311,6 +312,7 @@ function IPFSMediaItem({ cid }: IPFSMediaItemProps) {
         src={getMediaProxyUrl(cid)}
         alt={`IPFS media ${cid}`}
         fill
+        loading="lazy"
         className="object-cover"
         placeholder="blur"
         blurDataURL={BLUR_DATA_URL}
