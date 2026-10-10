@@ -95,6 +95,29 @@ export class WatchlistStore {
     return result.changes;
   }
 
+  /** Restores an exact wallet snapshot after a failed cross-store migration. */
+  replaceForWallet(scoutWallet: string, entries: WatchlistEntry[]): void {
+    const normalizedScoutWallet = normalizeStellarAddress(scoutWallet);
+    const replace = this.db.transaction((snapshot: WatchlistEntry[]) => {
+      this.db
+        .prepare('DELETE FROM watchlist WHERE scout_wallet = ?')
+        .run(normalizedScoutWallet);
+      const insert = this.db.prepare(
+        `INSERT INTO watchlist (id, scout_wallet, player_id, created_at)
+         VALUES (@id, @scout_wallet, @player_id, @created_at)`,
+      );
+      for (const entry of snapshot) {
+        insert.run({
+          id: entry.id,
+          scout_wallet: normalizedScoutWallet,
+          player_id: normalizeStellarAddress(entry.playerId),
+          created_at: entry.createdAt,
+        });
+      }
+    });
+    replace(entries);
+  }
+
   list(scoutWallet: string): WatchlistEntry[] {
     const normalizedScoutWallet = normalizeStellarAddress(scoutWallet);
     const rows = this.db
