@@ -6,9 +6,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node init && next dev",
+    "build": "node init && next build",
+    "start": "node init && next start",
     "lint": "next lint",
     "test": "jest --passWithNoTests --maxWorkers=2 --workerIdleMemoryLimit=512MB",
     "test:integration": "jest --config=jest.integration.config.js --runInBand",
@@ -26,7 +26,7 @@
     "a11y:audit": "node scripts/a11y-audit.mjs",
     "generate:icons": "node scripts/generate-icons.js",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "node init && storybook build",
     "test-storybook": "test-storybook",
     "test-storybook:ci": "concurrently -k -s first -n SB,TEST \"http-server storybook-static --port 6006 --silent\" \"wait-on tcp:127.0.0.1:6006 && test-storybook --url http://127.0.0.1:6006 --maxWorkers=2\"",
     "analyze": "cross-env ANALYZE=true npm run build",
