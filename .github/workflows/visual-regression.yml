@@ -18,15 +18,21 @@ jobs:
         node-version: 24
         cache: npm
     - run: npm ci --no-audit --no-fund
-    - name: Regenerate Storybook visual baselines
-      run: npm run test:visual:update
-    - name: Upload regenerated baselines
-      if: always()
+    # Compare Storybook visual regressions against committed baselines in
+    # e2e/visual/storybook.visual.spec.ts-snapshots/. Fails on visual drift beyond
+    # the maxDiffPixelRatio tolerance configured in playwright.visual.config.ts.
+    - name: Run Storybook visual regression tests
+      run: npm run test:visual
+    - name: Upload visual regression diff report on failure
+      if: failure()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
-        name: visual-baselines
-        path: e2e/visual/storybook.visual.spec.ts-snapshots/
+        name: visual-regression-report
+        path: |
+          test-results/
+          playwright-report/
         retention-days: 14
+        if-no-files-found: ignore
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
