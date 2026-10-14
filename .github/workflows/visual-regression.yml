@@ -18,14 +18,19 @@ jobs:
         node-version: 24
         cache: npm
     - run: npm ci --no-audit --no-fund
-    - name: Regenerate Storybook visual baselines
-      run: npm run test:visual:update
-    - name: Upload regenerated baselines
-      if: always()
+    # Compare rendered Storybook stories against the committed baseline PNGs in
+    # e2e/visual/storybook.visual.spec.ts-snapshots/ inside the pinned
+    # Playwright container image so font and GPU rendering remain deterministic.
+    - name: Run Storybook visual regression tests
+      run: npm run test:visual
+    - name: Upload diff report on failure
+      if: failure()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
-        name: visual-baselines
-        path: e2e/visual/storybook.visual.spec.ts-snapshots/
+        name: visual-regression-report
+        path: |
+          test-results/
+          playwright-report/
         retention-days: 14
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
