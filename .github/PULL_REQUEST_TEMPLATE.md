@@ -43,7 +43,7 @@ Include any additional context, screenshots, edge cases, or follow-up work.
 
 ## PR Body Source (optional — bulk-deploy workflow)
 
-If you maintain an offline copy of this PR's body in `docs/pr-bodies/`, link it here so reviewers and future rebases can find the canonical source. The CI `lint` job (see `.github/workflows/ci.yml`) validates every body file in `docs/pr-bodies/` against the contract documented in [`docs/pr-bodies/README.md`](docs/pr-bodies/README.md).
+If you maintain an offline copy of this PR's body in `docs/pr-bodies/`, link it here so reviewers and future rebases can find the canonical source. The CI `lint` job (see `.github/workflows/ci.yml`) validates every body file in `docs/pr-bodies/` against the contract documented in [`docs/pr-bodies/README.md`](../docs/pr-bodies/README.md).
 
 - Body file: `docs/pr-bodies/<branch-with-dashes>.md` (e.g. `feat/foo-bar.md` ↔ branch `feat/foo-bar`)
 - Required headers — comment markers at the very top:
