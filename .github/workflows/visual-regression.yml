@@ -18,9 +18,12 @@ jobs:
         node-version: 24
         cache: npm
     - run: npm ci --no-audit --no-fund
-    - name: Regenerate Storybook visual baselines
-      run: npm run test:visual:update
-    - name: Upload regenerated baselines
+    - name: Compare Storybook renders against committed baselines
+      run: npm run test:visual
+    # On failure the job still uploads the snapshot dir — Playwright writes
+    # the -expected/-actual/-diff triples next to the baselines, so the
+    # artifact is how reviewers see what drifted.
+    - name: Upload diff images on failure
       if: always()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
       with:
