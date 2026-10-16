@@ -2,31 +2,37 @@ name: Visual Regression
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 jobs:
   visual-regression:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:
-    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-      with:
-        node-version: 24
-        cache: npm
-    - run: npm ci --no-audit --no-fund
-    - name: Regenerate Storybook visual baselines
-      run: npm run test:visual:update
-    - name: Upload regenerated baselines
-      if: always()
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-      with:
-        name: visual-baselines
-        path: e2e/visual/storybook.visual.spec.ts-snapshots/
-        retention-days: 14
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      # Compare Storybook stories against committed baseline PNGs under
+      # e2e/visual/storybook.visual.spec.ts-snapshots/ and fail the job when
+      # any story exceeds the configured maxDiffPixelRatio threshold.
+      - name: Run Storybook visual regression comparison
+        run: npm run test:visual
+      - name: Upload visual regression failure diffs and report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: visual-regression-report
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
