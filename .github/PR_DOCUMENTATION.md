@@ -86,7 +86,7 @@ Examples:
 
 ### Bulk-deploy PRs (using `docs/pr-bodies/`)
 
-For multi-PR stacks authored from a fork against `promiscope/promiscope-frontend:main`, store each PR's body in [`docs/pr-bodies/<branch-with-dashes>.md`](docs/pr-bodies/README.md) _before_ opening the PR. The CI `lint` job (`.github/workflows/ci.yml`) runs a contract check that every body file in `docs/pr-bodies/`:
+For multi-PR stacks authored from a fork against `promiscope/promiscope-frontend:main`, store each PR's body in [`docs/pr-bodies/<branch-with-dashes>.md`](../docs/pr-bodies/README.md) _before_ opening the PR. The CI `lint` job (`.github/workflows/ci.yml`) runs a contract check that every body file in `docs/pr-bodies/`:
 
 - has both `<!-- Branch: <name> -->` and `<!-- Title: <commit-subject> -->` HTML comment headers at the top
 - contains a `## Summary` section and a `## Validation` table
