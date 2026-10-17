@@ -77,7 +77,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --no-audit --no-fund
 
       # ── 3. Stellar CLI ───────────────────────────────────────────────────────
       # Pin to a specific version so CLI flag changes don't silently break us.
