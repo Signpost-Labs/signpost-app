@@ -78,4 +78,10 @@ export class NotificationReadStore {
       .run(wallet);
     return result.changes;
   }
+
+  /** Restores an exact wallet snapshot after a failed cross-store migration. */
+  replaceForWallet(wallet: string, notificationIds: number[]): void {
+    this.clearForWallet(wallet);
+    this.markRead(wallet, notificationIds);
+  }
 }

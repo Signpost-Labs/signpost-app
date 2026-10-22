@@ -208,6 +208,32 @@ export class SavedSearchStore {
     return result.changes;
   }
 
+  /** Restores an exact wallet snapshot after a failed cross-store migration. */
+  replaceForWallet(scoutWallet: string, entries: SavedSearch[]): void {
+    const replace = this.db.transaction((snapshot: SavedSearch[]) => {
+      this.db
+        .prepare('DELETE FROM saved_search WHERE scout_wallet = ?')
+        .run(scoutWallet);
+      const insert = this.db.prepare(
+        `INSERT INTO saved_search
+           (id, scout_wallet, name, filter, created_at, last_viewed_at, version)
+         VALUES (@id, @scout_wallet, @name, @filter, @created_at, @last_viewed_at, @version)`,
+      );
+      for (const entry of snapshot) {
+        insert.run({
+          id: entry.id,
+          scout_wallet: scoutWallet,
+          name: entry.name,
+          filter: JSON.stringify(entry.filter),
+          created_at: entry.createdAt,
+          last_viewed_at: entry.lastViewedAt,
+          version: entry.version ?? 1,
+        });
+      }
+    });
+    replace(entries);
+  }
+
   list(scoutWallet: string): SavedSearch[] {
     const rows = this.db
       .prepare(
