@@ -32,9 +32,9 @@ export default async function Image({
       <div
         style={{
           display: 'flex',
-        fontSize: 92,
+          fontSize: 92,
           fontWeight: 800,
-        color: '#245d49',
+          color: '#245d49',
         }}
       >
         {BRAND_NAME}

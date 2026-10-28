@@ -115,8 +115,17 @@ export default function Navbar() {
             href={`/${currentLocale}`}
             className="flex items-center gap-2.5 text-[#245d49] font-semibold text-xl tracking-tight shrink-0"
           >
-            <span aria-hidden="true" className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#245d49] text-white">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7">
+            <span
+              aria-hidden="true"
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#245d49] text-white"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+              >
                 <path d="M3.5 12c2.1-3.4 4.9-5.1 8.5-5.1s6.4 1.7 8.5 5.1c-2.1 3.4-4.9 5.1-8.5 5.1S5.6 15.4 3.5 12Z" />
                 <circle cx="12" cy="12" r="2.2" />
               </svg>
@@ -258,7 +267,11 @@ export default function Navbar() {
 
             <Link
               href={`/${currentLocale}/organizations`}
-              aria-current={pathname === `/${currentLocale}/organizations` ? 'page' : undefined}
+              aria-current={
+                pathname === `/${currentLocale}/organizations`
+                  ? 'page'
+                  : undefined
+              }
               className="rounded px-1 py-2 transition hover:text-[#204e3d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#245d49]"
               onClick={closeMenu}
             >

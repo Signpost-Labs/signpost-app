@@ -195,8 +195,7 @@ async function postCompleteUpload(req: NextRequest) {
   try {
     const gatewayOverride = (globalThis as unknown as Record<string, unknown>)
       .__gatewayStreamForTests as
-      | (() => AsyncIterable<Uint8Array | Buffer>)
-      | undefined;
+      (() => AsyncIterable<Uint8Array | Buffer>) | undefined;
     await withOutboundSpan(
       'ipfs.upload.verify',
       { dependency: 'ipfs-gateway', operation: 'verify-upload' },
@@ -225,7 +224,6 @@ async function postCompleteUpload(req: NextRequest) {
   await cleanupSession(sessionId);
   return privateJson({ cid });
 }
-
 
 export const POST = withRouteTelemetry(
   postCompleteUpload,

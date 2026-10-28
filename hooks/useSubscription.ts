@@ -49,12 +49,7 @@ export function invalidateSubscriptionCache(publicKey: string): Promise<void> {
  *                   scout should check their wallet history before retrying.
  */
 export type SubscribeStatus =
-  | 'idle'
-  | 'submitting'
-  | 'confirming'
-  | 'confirmed'
-  | 'failed'
-  | 'timeout';
+  'idle' | 'submitting' | 'confirming' | 'confirmed' | 'failed' | 'timeout';
 
 export function useSubscription() {
   const { publicKey, signOnly } = useWallet();

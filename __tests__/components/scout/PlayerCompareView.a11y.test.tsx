@@ -107,7 +107,17 @@ describe('PlayerCompareView – accessibility', () => {
   });
 
   it('renders each player in their own section with proper heading', () => {
-    const players = [makePlayer({ vitals: { name: 'Alpha', age: 20, position: 'ST', region: 'West Africa', nationality: 'Ghanaian' } })];
+    const players = [
+      makePlayer({
+        vitals: {
+          name: 'Alpha',
+          age: 20,
+          position: 'ST',
+          region: 'West Africa',
+          nationality: 'Ghanaian',
+        },
+      }),
+    ];
     render(<PlayerCompareView players={players} />);
 
     const playerSection = screen.getByRole('region', {

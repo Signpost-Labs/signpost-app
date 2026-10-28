@@ -12,11 +12,7 @@
  */
 
 export type BulkImportRowStatus =
-  | 'pending'
-  | 'signing'
-  | 'success'
-  | 'failed'
-  | 'skipped';
+  'pending' | 'signing' | 'success' | 'failed' | 'skipped';
 
 export interface BulkImportRowState {
   /** 1-based row number from the file */

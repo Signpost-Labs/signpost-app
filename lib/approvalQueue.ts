@@ -7,11 +7,7 @@
  */
 
 export type ApprovalQueueStatus =
-  | 'pending'
-  | 'processing'
-  | 'confirmed'
-  | 'failed'
-  | 'invalid';
+  'pending' | 'processing' | 'confirmed' | 'failed' | 'invalid';
 
 export interface ApprovalIntent {
   /** SHA-256 of playerId + milestone + validator. Also the IndexedDB key. */

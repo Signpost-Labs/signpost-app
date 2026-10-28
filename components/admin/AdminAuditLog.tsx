@@ -125,8 +125,7 @@ export default function AdminAuditLog() {
               setFilter({
                 ...filter,
                 actionType: (e.target.value || undefined) as
-                  | AdminAuditActionType
-                  | undefined,
+                  AdminAuditActionType | undefined,
               })
             }
           >

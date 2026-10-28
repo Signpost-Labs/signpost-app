@@ -3,7 +3,7 @@
 ![CI](https://github.com/Signpost-Labs/signpost-app/actions/workflows/ci.yml/badge.svg)
 ![Stellar](https://img.shields.io/badge/Stellar-Soroban-7D00FF?logo=stellar&logoColor=white)
 
-Signpost helps communities follow project commitments, milestones, progress updates, supporting evidence, and responses. The frontend uses Stellar SEP-10 wallet authentication to attribute publishing activity to a wallet address; project records are stored off-chain. A wallet address does not prove an organization's identity or that its claims are true. 
+Signpost helps communities follow project commitments, milestones, progress updates, supporting evidence, and responses. The frontend uses Stellar SEP-10 wallet authentication to attribute publishing activity to a wallet address; project records are stored off-chain. A wallet address does not prove an organization's identity or that its claims are true.
 
 ## Table of Contents
 
@@ -39,10 +39,10 @@ Keep secrets server-side: never expose them through `NEXT_PUBLIC_` variables. Lo
 
 ## Prerequisites
 
-| Tool | Notes |
-| --- | --- |
-| **Node.js** | 24+ (see `.nvmrc`) |
-| **npm** | bundled with Node |
+| Tool                    | Notes                               |
+| ----------------------- | ----------------------------------- |
+| **Node.js**             | 24+ (see `.nvmrc`)                  |
+| **npm**                 | bundled with Node                   |
 | **Settla-style wallet** | any Stellar wallet for SEP-10 login |
 
 ## Development

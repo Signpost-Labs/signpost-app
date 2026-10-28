@@ -36,16 +36,11 @@ const NO_HIGHLIGHT_REEL_PLACEHOLDER = '';
 type Phase = 'upload' | 'preview' | 'submitting' | 'done';
 
 type RowSubmissionStatus =
-  | 'pending'
-  | 'signing'
-  | 'success'
-  | 'failed'
-  | 'skipped';
+  'pending' | 'signing' | 'success' | 'failed' | 'skipped';
 
 /** A parser file error, or a FileReader failure surfaced the same way. */
 type FileErrorState =
-  | BulkImportFileError
-  | { code: 'READ_FAILED'; params?: undefined };
+  BulkImportFileError | { code: 'READ_FAILED'; params?: undefined };
 
 interface RowSubmission {
   status: RowSubmissionStatus;
@@ -665,8 +660,14 @@ export default function BulkPlayerImport() {
                     validRows.length === 0 ||
                     !publicKey
                   }
-                  disabledReason={isPaused ? tContractStatus('paused_hint') : undefined}
-                  title={!isPaused && !publicKey ? t('connectWalletTitle') : undefined}
+                  disabledReason={
+                    isPaused ? tContractStatus('paused_hint') : undefined
+                  }
+                  title={
+                    !isPaused && !publicKey
+                      ? t('connectWalletTitle')
+                      : undefined
+                  }
                 >
                   {phase === 'submitting'
                     ? isPausedBatch

@@ -25,9 +25,9 @@ describe('SettingsLoading', () => {
     expect(header).toBeInTheDocument();
 
     // Multiple sections (notification, session, export, deletion)
-    const sections = screen.getAllByRole('generic').filter(
-      (el) => el.tagName === 'SECTION'
-    );
+    const sections = screen
+      .getAllByRole('generic')
+      .filter((el) => el.tagName === 'SECTION');
     expect(sections.length).toBeGreaterThanOrEqual(4);
   });
 });

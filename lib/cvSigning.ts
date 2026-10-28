@@ -25,7 +25,9 @@ function getPrivateKey() {
 
 function getPublicKey() {
   const configured = process.env.CV_SIGNING_PUBLIC_KEY;
-  return configured ? createPublicKey(configured) : createPublicKey(getPrivateKey());
+  return configured
+    ? createPublicKey(configured)
+    : createPublicKey(getPrivateKey());
 }
 
 export function hashCanonicalCvContent(canonicalContent: string): string {

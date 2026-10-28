@@ -431,7 +431,9 @@ describe('BulkPlayerImport', () => {
     // Row 1 builds immediately; row 2's XDR build is held open so the admin
     // can hit Cancel while row 2 is still being prepared (before its wallet
     // prompt).
-    let resolveSecondBuild: (val: string | PromiseLike<string>) => void = () => {};
+    let resolveSecondBuild: (
+      val: string | PromiseLike<string>,
+    ) => void = () => {};
     mockedBuildRegisterPlayer
       .mockResolvedValueOnce('mock-xdr-1')
       .mockImplementationOnce(
@@ -495,7 +497,9 @@ describe('BulkPlayerImport', () => {
   });
 
   it('preserves already-succeeded rows when cancelling mid-batch', async () => {
-    let resolveSecondBuild: (val: string | PromiseLike<string>) => void = () => {};
+    let resolveSecondBuild: (
+      val: string | PromiseLike<string>,
+    ) => void = () => {};
     mockedBuildRegisterPlayer
       .mockResolvedValueOnce('mock-xdr-1')
       .mockImplementationOnce(

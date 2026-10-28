@@ -134,7 +134,9 @@ describe('lib/seo', () => {
 
       const canonical = await getCanonicalUrl();
 
-      expect(canonical.toString()).toBe('https://promiscope.example/en/player/123');
+      expect(canonical.toString()).toBe(
+        'https://promiscope.example/en/player/123',
+      );
     });
 
     it('falls back to root when x-pathname is absent', async () => {

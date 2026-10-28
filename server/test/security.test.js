@@ -9,7 +9,8 @@ const tmpDbPath = path.join(
   'test.db',
 );
 process.env.DB_PATH = tmpDbPath;
-process.env.CORS_ORIGINS = 'https://promiscope.example, https://admin.promiscope.example';
+process.env.CORS_ORIGINS =
+  'https://promiscope.example, https://admin.promiscope.example';
 process.env.CORS_ORIGIN_PATTERN =
   '^https://promiscope-[a-z0-9-]+\\.vercel\\.app$';
 process.env.RATE_LIMIT_MAX = '1000';

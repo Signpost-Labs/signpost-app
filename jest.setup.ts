@@ -88,7 +88,8 @@ jest.mock('next-intl', () => ({
         connecting: 'Connecting…',
         disconnect: 'Disconnect Wallet',
         selectProvider: 'Select Wallet',
-        selectProviderHint: 'Choose a Stellar wallet to connect with Promiscope.',
+        selectProviderHint:
+          'Choose a Stellar wallet to connect with Promiscope.',
         install: 'Browser extension',
         installMobile: 'Browser extension / mobile',
         cancel: 'Cancel',

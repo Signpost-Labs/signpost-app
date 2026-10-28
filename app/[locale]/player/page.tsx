@@ -115,11 +115,7 @@ function PlayerDashboardContent() {
         });
       }
       const verification = await requestCvVerification(player, milestones);
-      const bytes = await generatePlayerCvPdf(
-        player,
-        milestones,
-        verification,
-      );
+      const bytes = await generatePlayerCvPdf(player, milestones, verification);
       downloadPlayerCvPdf(bytes, player.vitals.name);
       setCvExportStatus('idle');
     } catch {

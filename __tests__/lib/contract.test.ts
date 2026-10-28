@@ -161,10 +161,7 @@ describe('buildRegisterPlayer', () => {
     await buildRegisterPlayer(VALID_ADDRESS, vitals, 'QmHash', restoreSigner);
 
     expect(restoreSigner).toHaveBeenCalledWith('mock-xdr');
-    expect(mockSignAndSubmitTx).toHaveBeenCalledWith(
-      'mock-xdr',
-      restoreSigner,
-    );
+    expect(mockSignAndSubmitTx).toHaveBeenCalledWith('mock-xdr', restoreSigner);
     expect(mockRpc.prepareTransaction).toHaveBeenCalled();
   });
 

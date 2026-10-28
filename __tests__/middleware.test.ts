@@ -133,12 +133,16 @@ describe('middleware locale redirect', () => {
       await redirectFor(
         'https://promiscope.example/compare?ids=1,2&utm_source=x&utm_medium=y',
       ),
-    ).toBe('https://promiscope.example/en/compare?ids=1,2&utm_source=x&utm_medium=y');
+    ).toBe(
+      'https://promiscope.example/en/compare?ids=1,2&utm_source=x&utm_medium=y',
+    );
   });
 
   it('keeps encoded values intact', async () => {
     expect(
-      await redirectFor('https://promiscope.example/search?q=caf%C3%A9%20%26%20co'),
+      await redirectFor(
+        'https://promiscope.example/search?q=caf%C3%A9%20%26%20co',
+      ),
     ).toBe('https://promiscope.example/en/search?q=caf%C3%A9%20%26%20co');
   });
 

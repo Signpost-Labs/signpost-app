@@ -39,8 +39,7 @@ export const CLOCK_SKEW_ALLOWANCE_SEC = 60;
 export const MAX_CHALLENGE_FEE_STROOPS = 10_000;
 
 export type Sep10ValidationResult =
-  | { valid: true }
-  | { valid: false; reason: string };
+  { valid: true } | { valid: false; reason: string };
 
 export interface ValidateSep10ChallengeParams {
   challengeXdr: string;

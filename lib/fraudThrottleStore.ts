@@ -140,8 +140,7 @@ export class FraudThrottleStore {
          ORDER BY id DESC LIMIT 1`,
       )
       .get({ wallet: entry.wallet, heuristic: entry.heuristic }) as
-      | FraudThrottleRow
-      | undefined;
+      FraudThrottleRow | undefined;
     if (existing) return rowToThrottle(existing);
 
     const result = this.db

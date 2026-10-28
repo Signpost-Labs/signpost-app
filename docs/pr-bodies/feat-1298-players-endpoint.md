@@ -80,20 +80,20 @@ Diff stat of the feature commit `c4488e1`: **34 files changed, +2568 / −225**.
 Every command below was run on this branch at `c4488e1`; pre-existing failures were identified by
 running the same command against the parent commit `9092429` in a separate `git worktree`.
 
-| Check                     | Command                                   | Result                                                                                                    |
-| ------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Lint                      | `npm run lint`                            | ✅ exit 0                                                                                                 |
-| Types                     | `npm run type-check`                      | ✅ exit 0, 0 errors                                                                                       |
-| Indexer tests             | `npm test --workspace @promiscope/indexer`  | ✅ 174/174 pass                                                                                           |
-| Suites touched by this PR | `npx jest --ci` (8 suites)                | ✅ 81/81 pass                                                                                             |
-| Full frontend suite       | `npm run test`                            | ⚠️ 3360 passed / 15 failed — every one of the 15 also fails at `9092429` (see below)                      |
-| Accessibility (axe) gate  | `npx jest --ci --testPathPattern='a11y'`  | ✅ 87/87 pass (8 suites)                                                                                  |
-| Production build          | `npm run build`                           | ✅ compiled; `Generating static pages (101/101)`; same Sentry/PWA warnings as `main`                      |
-| Formatting                | `npm run format:check`                    | ⚠️ 9 pre-existing files (10 at `9092429`) — none of them is a file changed by this PR                     |
-| Env validation            | `node scripts/validate-env.js`            | ⚠️ exit 1 on pre-existing `.env.example` drift (`VERCEL`, `TRUSTED_PROXY_COUNT`, `HEALTH_MAX_LEDGER_LAG`) |
-| Locale key parity         | `node scripts/check-locale-keys.js`       | ✅ en / fr / sw                                                                                           |
-| Body-file contract        | `node scripts/validate-pr-bodies.js`      | ✅                                                                                                        |
-| E2E (Playwright)          | `npx playwright test e2e/`                | ⏭️ not run locally — needs the app plus a seeded indexer running; the CI e2e job covers it                |
+| Check                     | Command                                    | Result                                                                                                    |
+| ------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Lint                      | `npm run lint`                             | ✅ exit 0                                                                                                 |
+| Types                     | `npm run type-check`                       | ✅ exit 0, 0 errors                                                                                       |
+| Indexer tests             | `npm test --workspace @promiscope/indexer` | ✅ 174/174 pass                                                                                           |
+| Suites touched by this PR | `npx jest --ci` (8 suites)                 | ✅ 81/81 pass                                                                                             |
+| Full frontend suite       | `npm run test`                             | ⚠️ 3360 passed / 15 failed — every one of the 15 also fails at `9092429` (see below)                      |
+| Accessibility (axe) gate  | `npx jest --ci --testPathPattern='a11y'`   | ✅ 87/87 pass (8 suites)                                                                                  |
+| Production build          | `npm run build`                            | ✅ compiled; `Generating static pages (101/101)`; same Sentry/PWA warnings as `main`                      |
+| Formatting                | `npm run format:check`                     | ⚠️ 9 pre-existing files (10 at `9092429`) — none of them is a file changed by this PR                     |
+| Env validation            | `node scripts/validate-env.js`             | ⚠️ exit 1 on pre-existing `.env.example` drift (`VERCEL`, `TRUSTED_PROXY_COUNT`, `HEALTH_MAX_LEDGER_LAG`) |
+| Locale key parity         | `node scripts/check-locale-keys.js`        | ✅ en / fr / sw                                                                                           |
+| Body-file contract        | `node scripts/validate-pr-bodies.js`       | ✅                                                                                                        |
+| E2E (Playwright)          | `npx playwright test e2e/`                 | ⏭️ not run locally — needs the app plus a seeded indexer running; the CI e2e job covers it                |
 | Contract tests            | `cd ../promiscope-contracts && cargo test` | N/A — no contract code is touched by this PR                                                              |
 
 ### Pre-existing failures (verified on the parent commit, not introduced here)

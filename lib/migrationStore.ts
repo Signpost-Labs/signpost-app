@@ -28,11 +28,7 @@ import { openSqliteDb } from './sqliteDb';
 import type { Migration } from './sqliteMigrations';
 
 export type MigrationStatus =
-  | 'pending'
-  | 'cancelled'
-  | 'approved'
-  | 'completed'
-  | 'failed';
+  'pending' | 'cancelled' | 'approved' | 'completed' | 'failed';
 
 /** Duration of the cooling-off period in milliseconds. */
 export const COOLING_OFF_MS = 72 * 60 * 60 * 1000; // 72 hours

@@ -27,7 +27,10 @@ export const ShortContent: Story = {
         </p>
         <p>
           Questions about this policy can be sent to{' '}
-          <a href="mailto:privacy@promiscope.example">privacy@promiscope.example</a>.
+          <a href="mailto:privacy@promiscope.example">
+            privacy@promiscope.example
+          </a>
+          .
         </p>
       </>
     ),
@@ -84,7 +87,8 @@ export const LongContentWithTableOfContents: Story = {
         <h2 id="contact">Contact</h2>
         <p>
           For questions about these terms, contact{' '}
-          <a href="mailto:legal@promiscope.example">legal@promiscope.example</a>.
+          <a href="mailto:legal@promiscope.example">legal@promiscope.example</a>
+          .
         </p>
       </>
     ),

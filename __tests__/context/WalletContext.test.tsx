@@ -792,7 +792,8 @@ describe('WalletContext', () => {
       // Listen for storage events dispatched by disconnect().
       let storageEventFired = false;
       const handler = (e: StorageEvent) => {
-        if (e.key === 'promiscope:session-invalidated') storageEventFired = true;
+        if (e.key === 'promiscope:session-invalidated')
+          storageEventFired = true;
       };
       window.addEventListener('storage', handler);
 

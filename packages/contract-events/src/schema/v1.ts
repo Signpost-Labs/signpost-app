@@ -39,7 +39,10 @@ function define(topic: EventType): EventDefinition {
 }
 
 /** The v1 contract event topics and their payload decoders. */
-export const EVENT_SCHEMA_V1: Record<Exclude<EventType, 'unknown'>, EventDefinition> = {
+export const EVENT_SCHEMA_V1: Record<
+  Exclude<EventType, 'unknown'>,
+  EventDefinition
+> = {
   player_registered: define('player_registered'),
   milestone_approved: define('milestone_approved'),
   milestone_revoked: define('milestone_revoked'),

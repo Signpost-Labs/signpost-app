@@ -100,7 +100,9 @@ describe('Navbar', () => {
 
     renderNavbar();
 
-    expect(screen.getByRole('link', { name: /Promiscope/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Promiscope/i }),
+    ).toBeInTheDocument();
   });
 
   test('shows Connect Wallet button when wallet is disconnected', () => {

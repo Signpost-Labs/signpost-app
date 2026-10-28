@@ -62,12 +62,13 @@ This is observable independently of `isHealthy` (which fires after 5 consecutive
 `recordFailure` calls regardless of cursor movement).
 
 New `MetricSnapshot` fields:
-| Field | Type | Description |
-|---|---|---|
-| `consecutiveStuckCycles` | `number` | How many cycles without cursor advance |
-| `stuckAtLedger` | `number \| null` | Ledger where poller is stuck |
-| `isStuck` | `boolean` | True after `STUCK_CYCLE_THRESHOLD` cycles |
-| `lastRetentionWindowGap` | `RetentionWindowGap \| null` | Most recent skip-forward gap |
+
+| Field                    | Type                         | Description                               |
+| ------------------------ | ---------------------------- | ----------------------------------------- |
+| `consecutiveStuckCycles` | `number`                     | How many cycles without cursor advance    |
+| `stuckAtLedger`          | `number \| null`             | Ledger where poller is stuck              |
+| `isStuck`                | `boolean`                    | True after `STUCK_CYCLE_THRESHOLD` cycles |
+| `lastRetentionWindowGap` | `RetentionWindowGap \| null` | Most recent skip-forward gap              |
 
 ## Files changed
 

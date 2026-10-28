@@ -7,12 +7,13 @@ import '@testing-library/jest-dom';
 import DisputeMilestoneModal from '@/components/player/DisputeMilestoneModal';
 
 jest.mock('next-intl', () => ({
-  useTranslations: () => (key: string, params?: { count: number; max: number }) => {
-    if (key === 'character_count' && params) {
-      return `${params.count} of ${params.max} characters`;
-    }
-    return key;
-  },
+  useTranslations:
+    () => (key: string, params?: { count: number; max: number }) => {
+      if (key === 'character_count' && params) {
+        return `${params.count} of ${params.max} characters`;
+      }
+      return key;
+    },
 }));
 
 describe('DisputeMilestoneModal', () => {

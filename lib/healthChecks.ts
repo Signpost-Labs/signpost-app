@@ -10,10 +10,7 @@ import type Database from 'better-sqlite3';
 import { openSqliteDb } from './sqliteDb';
 
 export type DependencyStatus =
-  | 'ok'
-  | 'degraded'
-  | 'unreachable'
-  | 'not_configured';
+  'ok' | 'degraded' | 'unreachable' | 'not_configured';
 
 export interface DependencyCheck {
   status: DependencyStatus;

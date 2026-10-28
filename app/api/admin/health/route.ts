@@ -30,11 +30,7 @@ function pickDetail(data: Record<string, unknown>): Record<string, unknown> {
 }
 
 export type SubsystemStatus =
-  | 'ok'
-  | 'starting'
-  | 'degraded'
-  | 'unhealthy'
-  | 'unreachable';
+  'ok' | 'starting' | 'degraded' | 'unhealthy' | 'unreachable';
 
 const REPORTED_STATUSES: readonly SubsystemStatus[] = [
   'starting',

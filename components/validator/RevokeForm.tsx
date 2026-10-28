@@ -21,11 +21,7 @@ interface RevokeFormProps {
 }
 
 type ConfirmationState =
-  | 'idle'
-  | 'confirming'
-  | 'confirmed'
-  | 'failed-on-chain'
-  | 'timed-out';
+  'idle' | 'confirming' | 'confirmed' | 'failed-on-chain' | 'timed-out';
 
 interface RevokeState {
   txHash: string | null;

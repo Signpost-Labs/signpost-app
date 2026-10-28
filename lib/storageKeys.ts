@@ -37,6 +37,7 @@ export const BLOCKED_USERS_KEY = 'promiscope_blocked_users';
 export const UPLOAD_RESUME_KEY = 'promiscope:upload-resume';
 
 // session
-export const CONTRACT_PAUSED_DISMISSED_KEY = 'promiscope:contractPausedDismissed';
+export const CONTRACT_PAUSED_DISMISSED_KEY =
+  'promiscope:contractPausedDismissed';
 // session
 export const CONFIG_WARNING_DISMISSED_KEY = 'promiscope:configWarningDismissed';

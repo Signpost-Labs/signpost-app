@@ -157,8 +157,7 @@ export function useApprovalQueue(validatorAddress: string | null) {
 
         try {
           const history = (await getMilestoneHistory(intent.playerId)) as
-            | QueueMilestone[]
-            | undefined;
+            QueueMilestone[] | undefined;
           const duplicate = (history ?? []).some(
             (milestone) =>
               milestone.description === intent.milestone &&

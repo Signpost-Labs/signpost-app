@@ -4,11 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { subscribeToPush, unsubscribeFromPush } from '@/lib/api';
 
 export type PushStatus =
-  | 'unsupported'
-  | 'denied'
-  | 'subscribed'
-  | 'unsubscribed'
-  | 'loading';
+  'unsupported' | 'denied' | 'subscribed' | 'unsubscribed' | 'loading';
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 

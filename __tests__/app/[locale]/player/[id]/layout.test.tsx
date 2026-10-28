@@ -98,7 +98,9 @@ describe('PlayerProfileLayout', () => {
       expect(jsonLd.description).toContain('Forward');
       expect(jsonLd.description).toContain('West Africa');
       expect(jsonLd.description).toContain('Level 2');
-      expect(jsonLd.url).toBe('https://promiscope.example/en/player/player-abc-123');
+      expect(jsonLd.url).toBe(
+        'https://promiscope.example/en/player/player-abc-123',
+      );
       expect(jsonLd.identifier).toBe('player-abc-123');
       expect(jsonLd.sameAs).toEqual(
         expect.arrayContaining([
@@ -161,9 +163,9 @@ describe('PlayerProfileLayout', () => {
       expect(metadata.openGraph?.url).toBe(
         'https://promiscope.example/en/player/player-abc-123',
       );
-      expect(
-        (metadata.openGraph as { type?: string } | undefined)?.type,
-      ).toBe('profile');
+      expect((metadata.openGraph as { type?: string } | undefined)?.type).toBe(
+        'profile',
+      );
     });
 
     it('returns empty metadata when fetch fails', async () => {

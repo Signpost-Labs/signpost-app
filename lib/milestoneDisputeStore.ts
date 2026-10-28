@@ -34,10 +34,7 @@ import type {
  * filed. Defaults to 7 days. Override via DISPUTE_RESPONSE_WINDOW_MS env var.
  */
 export function getResponseWindowMs(): number {
-  const val = parseInt(
-    process.env.DISPUTE_RESPONSE_WINDOW_MS ?? '',
-    10,
-  );
+  const val = parseInt(process.env.DISPUTE_RESPONSE_WINDOW_MS ?? '', 10);
   return Number.isFinite(val) && val > 0 ? val : 7 * 24 * 60 * 60 * 1000;
 }
 
@@ -176,7 +173,10 @@ export interface CreateDisputeInput {
 }
 
 export interface DecideDisputeInput {
-  status: Exclude<MilestoneDisputeStatus, 'pending' | 'under_review' | 'escalated'>;
+  status: Exclude<
+    MilestoneDisputeStatus,
+    'pending' | 'under_review' | 'escalated'
+  >;
   decidedBy: string;
   resolutionNote: string | null;
   revokeTxHash: string | null;

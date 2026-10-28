@@ -77,7 +77,10 @@ export async function POST(
       { status: 400 },
     );
   }
-  if (typeof ipfsMimeType !== 'string' || !ALLOWED_MIME_TYPES.has(ipfsMimeType)) {
+  if (
+    typeof ipfsMimeType !== 'string' ||
+    !ALLOWED_MIME_TYPES.has(ipfsMimeType)
+  ) {
     return NextResponse.json(
       {
         error: `ipfsMimeType must be one of: ${[...ALLOWED_MIME_TYPES].join(', ')}`,

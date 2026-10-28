@@ -5,7 +5,11 @@ import { useWallet } from '@/hooks/useWallet';
 import { useToast } from '@/components/ui/Toast';
 import EmptyState from '@/components/ui/EmptyState';
 import { recordAuditEntry } from '@/lib/adminAuditClient';
-import { buildPauseContract, buildUnpauseContract, buildRemoveValidator } from '@/lib/contract';
+import {
+  buildPauseContract,
+  buildUnpauseContract,
+  buildRemoveValidator,
+} from '@/lib/contract';
 import {
   fetchActivityEvents,
   getReferralOverview,

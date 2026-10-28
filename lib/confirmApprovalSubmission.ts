@@ -45,11 +45,7 @@ export type ApprovalPhase =
   | 'error';
 
 export type ApprovalTerminalPhase =
-  | 'success'
-  | 'event_lag'
-  | 'failed'
-  | 'timeout'
-  | 'error';
+  'success' | 'event_lag' | 'failed' | 'timeout' | 'error';
 
 export interface ApprovalPhaseMeta {
   hash: string | null;

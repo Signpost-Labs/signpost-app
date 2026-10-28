@@ -821,12 +821,7 @@ export async function logTrialOffer(
   details: TrialOfferDetails,
   signFn: (xdr: string) => Promise<string>,
 ): Promise<void> {
-  const xdrTx = await buildLogTrialOffer(
-    scoutKey,
-    playerId,
-    details,
-    signFn,
-  );
+  const xdrTx = await buildLogTrialOffer(scoutKey, playerId, details, signFn);
   await signAndSubmitTx(xdrTx, signFn);
 }
 

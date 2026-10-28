@@ -70,7 +70,9 @@ describe('buildCvFilename', () => {
   });
 
   it('trims leading/trailing dashes produced by non-alphanumeric edges', () => {
-    expect(buildCvFilename('---Jane Doe---')).toBe('jane-doe-promiscope-cv.pdf');
+    expect(buildCvFilename('---Jane Doe---')).toBe(
+      'jane-doe-promiscope-cv.pdf',
+    );
   });
 
   it('falls back to "player" when the name has no alphanumeric characters', () => {

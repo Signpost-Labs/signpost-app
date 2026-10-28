@@ -26,10 +26,7 @@
 import type { PlayerVitals } from '@/types';
 
 export type OnboardingSyncStatus =
-  | 'pending'
-  | 'syncing'
-  | 'complete'
-  | 'failed';
+  'pending' | 'syncing' | 'complete' | 'failed';
 
 export interface PendingOnboardingSubmission {
   /** Also the IndexedDB record key. */
