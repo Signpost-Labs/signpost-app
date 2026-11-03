@@ -13,7 +13,9 @@ export interface IndexerFreshness {
 }
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_INDEXER_API_URL;
+  const baseUrl =
+    process.env.INDEXER_API_URL_INTERNAL ??
+    process.env.NEXT_PUBLIC_INDEXER_API_URL;
   if (!baseUrl) {
     return NextResponse.json(
       { error: 'Indexer not configured' },
