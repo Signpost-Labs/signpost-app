@@ -195,4 +195,25 @@ export class NotificationPreferencesStore {
       .run(wallet);
     return result.changes;
   }
+
+  /** Restores an exact wallet snapshot after a failed cross-store migration. */
+  replaceForWallet(
+    wallet: string,
+    snapshot: { preferences: NotificationPreferences; updatedAt: number },
+  ): void {
+    this.clearForWallet(wallet);
+    if (snapshot.updatedAt === 0) return;
+    this.db
+      .prepare(
+        `INSERT INTO notification_preferences
+           (wallet, milestone_approvals, contact_unlocks, updated_at)
+         VALUES (@wallet, @milestone_approvals, @contact_unlocks, @updated_at)`,
+      )
+      .run({
+        wallet,
+        milestone_approvals: snapshot.preferences.milestoneApprovals ? 1 : 0,
+        contact_unlocks: snapshot.preferences.contactUnlocks ? 1 : 0,
+        updated_at: snapshot.updatedAt,
+      });
+  }
 }

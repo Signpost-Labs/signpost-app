@@ -65,6 +65,10 @@ export async function executeWalletMigration(
   fromWallet: string,
   toWallet: string,
 ): Promise<MigrationResult> {
+  if (fromWallet === toWallet) {
+    throw new Error('fromWallet and toWallet must be different');
+  }
+
   const watchlistStore = WatchlistStore.getInstance();
   const savedSearchStore = SavedSearchStore.getInstance();
   const notifPrefsStore = NotificationPreferencesStore.getInstance();
@@ -72,57 +76,131 @@ export async function executeWalletMigration(
   const recentlyViewedStore = RecentlyViewedStore.getInstance();
   const sessionStore = SessionStore.getInstance();
 
-  // Snapshot all data before any destructive writes.
-  const watchlistItems = watchlistStore.list(fromWallet);
-  const savedSearchItems = savedSearchStore.list(fromWallet);
-  const notifPrefs = notifPrefsStore.get(fromWallet);
-  const readIds = notifReadStore.getReadIds(fromWallet);
-  const recentlyViewed = recentlyViewedStore.list(fromWallet);
+  // Each store has its own SQLite connection, so there is no shared SQL
+  // transaction. Capture both wallet sides before the first write and use
+  // these snapshots as compensating state if a later store fails.
+  const snapshot = {
+    watchlist: {
+      from: watchlistStore.list(fromWallet),
+      to: watchlistStore.list(toWallet),
+    },
+    savedSearches: {
+      from: savedSearchStore.list(fromWallet),
+      to: savedSearchStore.list(toWallet),
+    },
+    notifPrefs: {
+      from: notifPrefsStore.getWithVersion(fromWallet),
+      to: notifPrefsStore.getWithVersion(toWallet),
+    },
+    readIds: {
+      from: notifReadStore.getReadIds(fromWallet),
+      to: notifReadStore.getReadIds(toWallet),
+    },
+    recentlyViewed: {
+      from: recentlyViewedStore.list(fromWallet),
+      to: recentlyViewedStore.list(toWallet),
+    },
+    sessions: {
+      from: sessionStore.listForWallet(fromWallet),
+      to: sessionStore.listForWallet(toWallet),
+    },
+  };
+
+  const watchlistItems = snapshot.watchlist.from;
+  const savedSearchItems = snapshot.savedSearches.from;
+  const notifPrefs = snapshot.notifPrefs.from.preferences;
+  const readIds = snapshot.readIds.from;
+  const recentlyViewed = snapshot.recentlyViewed.from;
 
   let sessionsRevoked = 0;
 
-  // 1. Watchlist
-  watchlistStore.clearForWallet(fromWallet);
-  for (const item of watchlistItems) {
-    try {
+  try {
+    // Write the destination first, then clear the source. This ordering keeps
+    // the source intact if any destination write fails.
+    for (const item of watchlistItems) {
       watchlistStore.add(toWallet, item.playerId);
-    } catch {
-      // toWallet may already have this player in its watchlist — skip duplicate
     }
-  }
+    watchlistStore.clearForWallet(fromWallet);
 
-  // 2. Saved searches
-  savedSearchStore.clearForWallet(fromWallet);
-  for (const search of savedSearchItems) {
-    try {
+    for (const search of savedSearchItems) {
       savedSearchStore.add(toWallet, search.name, search.filter);
-    } catch {
-      // Duplicate name conflict — skip
     }
-  }
+    savedSearchStore.clearForWallet(fromWallet);
 
-  // 3. Notification preferences
-  notifPrefsStore.set(toWallet, notifPrefs);
-  notifPrefsStore.clearForWallet(fromWallet);
+    notifPrefsStore.set(toWallet, notifPrefs);
+    notifPrefsStore.clearForWallet(fromWallet);
 
-  // 4. Notification read state
-  notifReadStore.clearForWallet(fromWallet);
-  if (readIds.length > 0) {
-    notifReadStore.markRead(toWallet, readIds);
-  }
+    if (readIds.length > 0) {
+      notifReadStore.markRead(toWallet, readIds);
+    }
+    notifReadStore.clearForWallet(fromWallet);
 
-  // 5. Recently viewed
-  recentlyViewedStore.clearForWallet(fromWallet);
-  for (const item of recentlyViewed) {
-    try {
+    for (const item of recentlyViewed) {
       recentlyViewedStore.record(toWallet, item.playerId, item.viewedAt);
-    } catch {
-      // Skip on error
     }
-  }
+    recentlyViewedStore.clearForWallet(fromWallet);
 
-  // 6. Revoke all active sessions for fromWallet (security requirement per issue #1315)
-  sessionsRevoked = sessionStore.revokeAllForWallet(fromWallet);
+    // Revoke all active sessions only after every data store has committed.
+    sessionsRevoked = sessionStore.revokeAllForWallet(fromWallet);
+  } catch (error) {
+    const rollbackErrors: unknown[] = [];
+    const rollback = (action: () => void) => {
+      try {
+        action();
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError);
+      }
+    };
+
+    rollback(() => {
+      watchlistStore.replaceForWallet(toWallet, snapshot.watchlist.to);
+      watchlistStore.replaceForWallet(fromWallet, snapshot.watchlist.from);
+    });
+    rollback(() => {
+      savedSearchStore.replaceForWallet(toWallet, snapshot.savedSearches.to);
+      savedSearchStore.replaceForWallet(
+        fromWallet,
+        snapshot.savedSearches.from,
+      );
+    });
+    rollback(() => {
+      notifPrefsStore.replaceForWallet(toWallet, snapshot.notifPrefs.to);
+      notifPrefsStore.replaceForWallet(fromWallet, snapshot.notifPrefs.from);
+    });
+    rollback(() => {
+      notifReadStore.replaceForWallet(toWallet, snapshot.readIds.to);
+      notifReadStore.replaceForWallet(fromWallet, snapshot.readIds.from);
+    });
+    rollback(() => {
+      recentlyViewedStore.replaceForWallet(
+        toWallet,
+        snapshot.recentlyViewed.to,
+      );
+      recentlyViewedStore.replaceForWallet(
+        fromWallet,
+        snapshot.recentlyViewed.from,
+      );
+    });
+    rollback(() => {
+      sessionStore.replaceForWallet(toWallet, snapshot.sessions.to);
+      sessionStore.replaceForWallet(fromWallet, snapshot.sessions.from);
+    });
+
+    if (rollbackErrors.length > 0) {
+      const details = rollbackErrors
+        .map((rollbackError) =>
+          rollbackError instanceof Error
+            ? rollbackError.message
+            : String(rollbackError),
+        )
+        .join('; ');
+      throw new Error(
+        `Wallet migration failed and rollback was incomplete: ${details}`,
+        { cause: error },
+      );
+    }
+    throw error;
+  }
 
   return {
     fromWallet,
