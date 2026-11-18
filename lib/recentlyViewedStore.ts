@@ -130,6 +130,28 @@ export class RecentlyViewedStore {
     return result.changes;
   }
 
+  /** Restores an exact wallet snapshot after a failed cross-store migration. */
+  replaceForWallet(scoutWallet: string, entries: RecentlyViewedEntry[]): void {
+    const replace = this.db.transaction((snapshot: RecentlyViewedEntry[]) => {
+      this.db
+        .prepare('DELETE FROM recently_viewed WHERE scout_wallet = ?')
+        .run(scoutWallet);
+      const insert = this.db.prepare(
+        `INSERT INTO recently_viewed (id, scout_wallet, player_id, viewed_at)
+         VALUES (@id, @scout_wallet, @player_id, @viewed_at)`,
+      );
+      for (const entry of snapshot) {
+        insert.run({
+          id: entry.id,
+          scout_wallet: scoutWallet,
+          player_id: entry.playerId,
+          viewed_at: entry.viewedAt,
+        });
+      }
+    });
+    replace(entries);
+  }
+
   /**
    * Returns all recently viewed entries for a scout wallet, ordered by
    * most recent first.
