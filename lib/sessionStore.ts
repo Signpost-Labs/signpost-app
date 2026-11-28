@@ -185,6 +185,30 @@ export class SessionStore {
     return result.changes;
   }
 
+  /** Restores an exact wallet snapshot after a failed cross-store migration. */
+  replaceForWallet(wallet: string, sessions: SessionRow[]): void {
+    const replace = this.db.transaction((snapshot: SessionRow[]) => {
+      this.db.prepare('DELETE FROM sessions WHERE wallet = ?').run(wallet);
+      const insert = this.db.prepare(
+        `INSERT INTO sessions
+           (id, wallet, created_at, expires_at, last_seen_at, revoked_at, user_agent)
+         VALUES (@id, @wallet, @created_at, @expires_at, @last_seen_at, @revoked_at, @user_agent)`,
+      );
+      for (const session of snapshot) {
+        insert.run({
+          id: session.id,
+          wallet,
+          created_at: session.createdAt,
+          expires_at: session.expiresAt,
+          last_seen_at: session.lastSeenAt,
+          revoked_at: session.revokedAt,
+          user_agent: session.userAgent,
+        });
+      }
+    });
+    replace(sessions);
+  }
+
   /** Lists every session row (active or revoked) for wallet, newest first. */
   listForWallet(wallet: string): SessionRow[] {
     const rows = this.db
